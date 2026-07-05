@@ -62,7 +62,8 @@ Trigger it with your question:
 - `council this` · `run the council` · `pressure-test this` · `stress-test this` · `war room this` · `debate this`
 
 ```
-council this: should we migrate this service off Firebase onto Supabase, or stay put? Context is in CLAUDE.md.
+council this: should I quit my stable job to go all-in on my side project
+($2k/month and growing), negotiate part-time, or keep grinding nights?
 ```
 
 You get a visual `council-report-[timestamp].html` (opens automatically) and a full `council-transcript-[timestamp].md`. See a **real sample run** in [`examples/`](examples/).
@@ -114,7 +115,7 @@ Every run is logged to `council-journal.json` and rendered into `council-journal
 Then the accountability loop:
 
 ```
-council revisit: the Firebase migration decision
+council revisit: the quit-my-job decision
 ```
 
 You tell the council what actually happened; a single sub-agent scores the original recommendation — **hit / miss / mixed** — names which advisor's position aged best, and extracts one transferable lesson. The journal tracks the hit rate over time. After ten decisions you know something nobody else can tell you: *whether your council is actually right, and which lens to trust on which kind of call.* A council that can't admit misses is a horoscope — this one keeps score.
@@ -143,7 +144,7 @@ Every run fills the shipped [`report-template.html`](report-template.html) — d
 - Tinted feature cards: blue-gradient **first step** with an oversized numeral, red **Consult Before Acting**, amber verify-flags; `[verified]`/`[recalled]` as green/neutral underline citations
 - **Automatic dark mode** (true-black, iOS dark palette), print/PDF stylesheet, copy-verdict button, staggered load animations, zero external assets — works offline forever
 
-*(Preview: open [`examples/firebase-to-supabase-migration.report.html`](examples/firebase-to-supabase-migration.report.html) in a browser.)*
+*(Preview: open [`examples/quit-job-for-side-project.report.html`](examples/quit-job-for-side-project.report.html) in a browser.)*
 
 ## Choose the model for each council member
 
