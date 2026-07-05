@@ -349,7 +349,7 @@ Token reference (all HTML-safe strings; fill empty string where noted):
 
 **Icon sprite** — the template ships an inline SVG symbol set; reference icons with `<svg class="gicon"><use href="#id"/></svg>`. Advisor ids: `i-contrarian`, `i-first`, `i-strategist`, `i-executor`, `i-domain`, `i-expert`, `i-reviewer`. Utility ids: `i-agree`, `i-clash`, `i-blind`, `i-compass`, `i-step`, `i-human`, `i-warn`, `i-chev`, `i-seal`. Use these — never emoji — in any content you inject.
 
-**Fallback** (only if the template file is missing): generate a single self-contained HTML file in the same editorial-minimal style — warm paper background, near-black ink, ONE accent color, hairline rules, serif display type (`ui-serif`/Georgia stack), mono small-caps labels, inline SVG stroke icons (no emoji), numbered § sections, hairline spectrum with diamond markers, dot-matrix vote tally, collapsible advisor entries, a bordered Consult Before Acting block, dark-mode via `prefers-color-scheme`, print stylesheet, zero external assets.
+**Fallback** (only if the template file is missing): generate a single self-contained HTML file in the same Apple-minimal style — luminous `#f5f5f7` background, white cards with large radii and soft diffuse shadows (no borders), generous whitespace, `-apple-system` type with a large tracking-tight hero headline, ONE blue accent used sparingly, iOS-style gradient icon tiles with white SVG stroke glyphs (no emoji), a frosted-glass segmented control for tabs, a rounded-rail spectrum with pill markers, dot-matrix vote tally, tinted feature cards (blue = first step, red = Consult Before Acting, amber = verify flags), dark-mode via `prefers-color-scheme`, print stylesheet, zero external assets.
 
 ### step 6: save the full transcript
 

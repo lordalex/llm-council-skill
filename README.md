@@ -110,15 +110,16 @@ The council is a session, not a vending machine. Three light checkpoints — say
 
 ## The report
 
-Every run fills the shipped [`report-template.html`](report-template.html) — an editorial briefing, not a dashboard. Warm paper, near-black ink, one oxblood accent, hairline rules, serif display type with mono small-caps labels, and a consistent inline SVG stroke-icon system (no emoji, no images, no webfonts):
+Every run fills the shipped [`report-template.html`](report-template.html) — designed on Apple's philosophy: whitespace used deliberately, white cards floating on the signature `#f5f5f7` gray, soft diffuse shadows instead of borders, one blue accent used with discipline, and SF Pro rendering natively on Apple devices (`-apple-system`, no webfonts):
 
-- **Three tabs** (Verdict / The Council / Peer Review) as understated underline nav, keyboard `1`–`3`
-- **§-numbered verdict sections** with stroke icons — agreement, dissent, blind spots
-- **Hairline position spectrum** — each advisor as a diamond marker on the decision axis
-- **Dot-matrix blind-vote tally** — who the anonymous review ranked strongest, whose blind spot got flagged
-- Hairline-separated advisor entries (icon medallion, stance line, mono model tag), cross-examination threads inline
-- **Consult Before Acting** as a bordered accent block; unverified claims as a dashed footnote; `[verified]`/`[recalled]` as dotted-underline citations in Expert responses
-- **Automatic dark mode**, print/PDF stylesheet, copy-verdict button, zero external assets — works offline forever
+- **Centered hero** — eyebrow label, large tracking-tight headline, quiet subtitle, pill meta chips
+- **Frosted-glass segmented control** (iOS-style) for Verdict / The Council / Peer Review, keyboard `1`–`3`
+- **Gradient icon tiles** (iOS Settings-style) with white SVG stroke glyphs — per-section and per-advisor color identity, no emoji, no images
+- **Rounded-rail spectrum** — each advisor as a floating pill marker on the decision axis
+- **Dot-matrix blind-vote tally** with soft-glow filled dots
+- White advisor cards with hover lift, stance previews, model tags, cross-examination threads inset
+- Tinted feature cards: blue-gradient **first step** with an oversized numeral, red **Consult Before Acting**, amber verify-flags; `[verified]`/`[recalled]` as green/neutral underline citations
+- **Automatic dark mode** (true-black, iOS dark palette), print/PDF stylesheet, copy-verdict button, staggered load animations, zero external assets — works offline forever
 
 *(Preview: open [`examples/firebase-to-supabase-migration.report.html`](examples/firebase-to-supabase-migration.report.html) in a browser.)*
 

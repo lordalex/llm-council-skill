@@ -6,195 +6,202 @@
 <title>Council Verdict — {{QUESTION_TITLE}}</title>
 <style>
 :root{
-  --paper:#faf8f2; --ink:#1d1b16; --muted:#7d7668; --faint:#a9a294;
-  --rule:#e5dfd2; --rule-strong:#c9c2b2; --accent:#8a2f26; --accent-soft:#f3e6e2;
-  --wash:#f2efe6;
+  --bg:#f5f5f7; --card:#ffffff; --ink:#1d1d1f; --gray:#6e6e73; --gray2:#86868b;
+  --hairline:#d2d2d7; --accent:#0071e3; --accent-ink:#0066cc;
+  --tint-blue:#e8f1fd; --tint-red:#fdeceb; --red:#e0342b; --amber:#b25000; --tint-amber:#fdf3e7;
+  --h1:#5e5ce6; --h2:#0071e3; --h3:#e08700; --h4:#34a853; --h5:#af52de; --h6:#00a8b5;
+  --r:20px; --r-sm:12px;
+  --shadow:0 2px 8px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.06);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.05);
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --paper:#161511; --ink:#e8e3d7; --muted:#98917f; --faint:#6b6557;
-    --rule:#2b2921; --rule-strong:#413d31; --accent:#d07a63; --accent-soft:#2c1d18;
-    --wash:#1d1b16;
+    --bg:#000000; --card:#1c1c1e; --ink:#f5f5f7; --gray:#98989d; --gray2:#8e8e93;
+    --hairline:#38383a; --accent:#0a84ff; --accent-ink:#409cff;
+    --tint-blue:#122a44; --tint-red:#3a1512; --red:#ff453a; --amber:#ffb340; --tint-amber:#33230e;
+    --h1:#7d7aff; --h2:#0a84ff; --h3:#ff9f0a; --h4:#30d158; --h5:#bf5af2; --h6:#40c8e0;
+    --shadow:0 2px 8px rgba(0,0,0,.5),0 12px 32px rgba(0,0,0,.45);
+    --shadow-sm:0 1px 3px rgba(0,0,0,.5);
   }
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);
-  font-family:ui-serif,"New York","Iowan Old Style",Georgia,"Times New Roman",serif;
-  font-size:15.5px;line-height:1.68;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(1200px 500px at 50% -220px,rgba(0,0,0,.028),transparent 70%)}
-.mono{font-family:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace}
-.wrap{max-width:720px;margin:0 auto;padding:0 26px 110px}
-svg.gicon{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.6;
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.wrap{max-width:780px;margin:0 auto;padding:0 22px 120px}
+svg.gicon{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.9;
   stroke-linecap:round;stroke-linejoin:round;vertical-align:-.12em;flex:none}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
-/* ---------- masthead ---------- */
-.masthead{padding-top:54px;animation:rise .7s .05s both}
-.mast-top{display:flex;justify-content:space-between;align-items:baseline;
-  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
-  letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
-.mast-top .seal{display:inline-flex;align-items:center;gap:9px;color:var(--ink)}
-.mast-top .seal svg{width:17px;height:17px;color:var(--accent)}
-.mast-rule{border:0;border-top:2.5px solid var(--ink);margin:14px 0 0;position:relative}
-.mast-rule::after{content:"";display:block;border-top:1px solid var(--ink);margin-top:3px}
-h1{font-size:clamp(27px,4.6vw,38px);line-height:1.16;font-weight:600;
-  letter-spacing:-.015em;margin:30px 0 14px;text-wrap:balance}
-.dek{font-size:16px;font-style:italic;color:var(--muted);max-width:58ch;margin:0}
-.metaline{display:flex;flex-wrap:wrap;gap:6px 0;align-items:center;margin:26px 0 0;
-  padding:12px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
-  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.metaline .chip{white-space:nowrap}
-.metaline .chip+.chip::before{content:"·";margin:0 9px;color:var(--faint)}
-.metaline .chip.hot{color:var(--accent);font-weight:700}
+/* ================= hero ================= */
+.hero{text-align:center;padding:84px 0 46px;animation:rise .7s .05s both}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.eyebrow .dateline{color:var(--gray2);font-weight:500;letter-spacing:.06em;text-transform:none;margin-left:10px}
+h1{font-size:clamp(30px,5.4vw,46px);line-height:1.09;font-weight:700;letter-spacing:-.022em;
+  margin:16px auto 16px;max-width:20ch;text-wrap:balance}
+.dek{font-size:17px;line-height:1.5;color:var(--gray);max-width:56ch;margin:0 auto}
+.metaline{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:28px}
+.chip{font-size:12px;font-weight:500;color:var(--gray);background:var(--card);
+  border-radius:100px;padding:6px 14px;box-shadow:var(--shadow-sm);white-space:nowrap}
+.chip.hot{color:#fff;background:var(--accent);font-weight:600}
 
-/* ---------- nav ---------- */
-.tabbar{position:sticky;top:0;z-index:40;display:flex;gap:34px;margin:0 0 44px;
-  padding:16px 0 0;background:var(--paper);border-bottom:1px solid var(--rule)}
-.tab{appearance:none;border:0;background:none;cursor:pointer;padding:0 2px 13px;
-  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--muted);position:relative;transition:color .2s}
-.tab:hover{color:var(--ink)}
-.tab::after{content:"";position:absolute;left:0;right:100%;bottom:-1px;
-  border-bottom:2px solid var(--accent);transition:right .28s cubic-bezier(.7,0,.3,1)}
-.tab.active{color:var(--ink)}
-.tab.active::after{right:0}
-.tab .kbd{opacity:.45;margin-left:6px}
+/* ================= segmented control ================= */
+.tabbar{position:sticky;top:14px;z-index:50;display:flex;gap:2px;width:max-content;max-width:100%;
+  margin:26px auto 54px;padding:3px;border-radius:100px;
+  background:color-mix(in srgb,var(--card) 72%,transparent);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  box-shadow:var(--shadow-sm),inset 0 0 0 .5px var(--hairline)}
+.tab{appearance:none;border:0;cursor:pointer;background:transparent;color:var(--gray);
+  font:inherit;font-size:13.5px;font-weight:600;padding:8px 22px;border-radius:100px;
+  transition:color .25s;white-space:nowrap}
+.tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 45%,transparent)}
+.tab .kbd{display:none}
 .panel{display:none}
 .panel.active{display:block;animation:rise .5s both}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* ---------- shared ---------- */
-.sec{margin:0 0 40px;animation:rise .6s both}
-.sec:nth-of-type(2){animation-delay:.06s}.sec:nth-of-type(3){animation-delay:.12s}
-.sec-head{display:flex;align-items:baseline;gap:14px;margin:0 0 14px}
-.sec-no{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
-  color:var(--accent);letter-spacing:.08em}
-.sec-head h2{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0;
-  display:flex;align-items:center;gap:9px}
-.sec-head h2 svg{width:15px;height:15px;color:var(--ink)}
-.sec-head .fill{flex:1;border-bottom:1px solid var(--rule)}
-.sec p,.sec ul{margin:10px 0;color:color-mix(in srgb,var(--ink) 92%,var(--muted))}
-.sec ul{padding-left:1.15em}
-.sec li{margin:7px 0}
-.toolbar{display:flex;gap:22px;justify-content:flex-end;margin:0 0 26px}
-.btn{appearance:none;border:0;background:none;cursor:pointer;padding:0;
-  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--muted);border-bottom:1px solid transparent}
-.btn:hover{color:var(--ink);border-bottom-color:var(--rule-strong)}
+/* ================= cards & sections ================= */
+.sec{margin:0 0 18px}
+.card-box{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:26px 30px;margin-bottom:18px;animation:rise .6s both}
+.card-box:nth-of-type(2){animation-delay:.05s}.card-box:nth-of-type(3){animation-delay:.1s}
+.card-box:nth-of-type(4){animation-delay:.15s}
+.sec-head{display:flex;align-items:center;gap:13px;margin:0 0 12px}
+.tile{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:#fff;flex:none;
+  box-shadow:inset 0 -6px 12px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.25)}
+.tile svg{width:18px;height:18px}
+.t-agree{background:linear-gradient(160deg,#4cd964,#28a745)}
+.t-clash{background:linear-gradient(160deg,#ff9f0a,#f56300)}
+.t-blind{background:linear-gradient(160deg,#bf5af2,#8944ab)}
+.t-rec{background:linear-gradient(160deg,#3ca5ff,#0071e3)}
+.t-step{background:linear-gradient(160deg,#5e5ce6,#3634a3)}
+.t-human{background:linear-gradient(160deg,#ff6961,#e0342b)}
+.t-warn{background:linear-gradient(160deg,#ffcc00,#e08700)}
+.sec-head h2{font-size:19px;font-weight:700;letter-spacing:-.014em;margin:0}
+.sec-head .sub{display:block;font-size:12px;font-weight:500;color:var(--gray2);letter-spacing:.02em;margin-top:1px}
+.card-box p,.card-box ul{margin:9px 0;font-size:15px;color:color-mix(in srgb,var(--ink) 86%,var(--gray))}
+.card-box ul{padding-left:1.2em}
+.card-box li{margin:7px 0}
+.toolbar{display:flex;gap:10px;justify-content:center;margin:0 0 22px}
+.btn{appearance:none;border:0;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;
+  color:var(--accent-ink);background:var(--card);border-radius:100px;padding:7px 16px;
+  box-shadow:var(--shadow-sm);transition:transform .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
 
-/* ---------- verdict blocks ---------- */
-.rec{border-top:2px solid var(--ink);border-bottom:1px solid var(--rule);
-  padding:22px 0 24px;margin:46px 0 0}
-.rec .k{display:flex;align-items:center;gap:9px;font-family:ui-monospace,"SF Mono",Menlo,monospace;
-  font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:700}
-.rec .k svg{width:15px;height:15px}
-.rec p{font-size:17px;line-height:1.62;margin:14px 0 0}
-.first{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:baseline;
-  padding:24px 0;border-bottom:1px solid var(--rule)}
-.first .num{font-size:46px;font-weight:600;line-height:.9;color:var(--accent);
-  font-variant-numeric:lining-nums}
-.first .k{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-.first p{margin:7px 0 0;font-size:15.5px}
-.consult{margin:26px 0 0;padding:20px 22px;background:var(--accent-soft);
-  border-left:2px solid var(--accent)}
-.consult .k{display:flex;align-items:center;gap:9px;font-family:ui-monospace,"SF Mono",Menlo,monospace;
-  font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700}
-.consult .k svg{width:15px;height:15px}
-.consult p,.consult ul{font-size:14.5px;margin:10px 0 0}
-.flagnote{display:grid;grid-template-columns:auto 1fr;gap:12px;margin:26px 0 0;
-  padding:16px 0 0;border-top:1px dashed var(--rule-strong);
-  font-size:13.5px;color:var(--muted);font-style:italic}
-.flagnote svg{width:16px;height:16px;margin-top:3px;color:var(--muted)}
+/* ================= verdict feature cards ================= */
+.rec{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:28px 30px;margin:26px 0 0;animation:rise .6s .18s both}
+.rec p{font-size:16.5px;line-height:1.6;margin:12px 0 0;font-weight:450}
+.first{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;
+  background:linear-gradient(160deg,var(--tint-blue),var(--card) 70%);
+  border-radius:var(--r);box-shadow:var(--shadow);padding:26px 30px;margin-top:18px;
+  animation:rise .6s .24s both}
+.first .num{font-size:56px;font-weight:800;letter-spacing:-.04em;line-height:1;
+  background:linear-gradient(160deg,#3ca5ff,#0058b0);-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+.first .k{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+.first p{margin:6px 0 0;font-size:15px}
+.consult{background:var(--tint-red);border-radius:var(--r);padding:24px 28px;margin-top:18px;
+  animation:rise .6s .28s both}
+.consult .k{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;color:var(--red)}
+.consult p,.consult ul{font-size:14.5px;margin:10px 0 0;color:color-mix(in srgb,var(--ink) 84%,var(--red))}
+.flagnote{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;
+  background:var(--tint-amber);border-radius:var(--r);padding:20px 24px;margin-top:18px;
+  font-size:13.5px;color:color-mix(in srgb,var(--ink) 80%,var(--amber));animation:rise .6s .32s both}
+.flagnote>svg{width:17px;height:17px;color:var(--amber);margin-top:2px}
 
-/* ---------- spectrum ---------- */
-.spectrum{padding:8px 0 6px}
-.axis{display:flex;justify-content:space-between;font-family:ui-monospace,"SF Mono",Menlo,monospace;
-  font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:16px}
-.spec-row{display:grid;grid-template-columns:148px 1fr;gap:18px;align-items:center;padding:11px 0;
-  border-bottom:1px solid var(--rule)}
-.spec-row:last-child{border-bottom:0}
-.spec-row .who{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:9px}
-.spec-row .who svg{width:14px;height:14px;color:var(--ink)}
-.spec-track{position:relative;height:22px;border-bottom:1px solid var(--rule-strong)}
-.spec-track::before,.spec-track::after{content:"";position:absolute;bottom:-3.5px;width:1px;height:7px;
-  background:var(--rule-strong)}
-.spec-track::before{left:0}.spec-track::after{right:0}
-.spec-label{position:absolute;left:var(--pos);bottom:5px;transform:translateX(-50%);
-  font-size:12px;font-style:italic;color:var(--ink);white-space:nowrap;padding-bottom:8px}
-.spec-label::after{content:"";position:absolute;left:50%;bottom:-9px;width:8px;height:8px;
-  background:var(--accent);transform:translateX(-50%) rotate(45deg);
-  outline:3px solid var(--paper)}
-@media (max-width:620px){.spec-row{grid-template-columns:104px 1fr}.spec-label{font-size:10.5px}}
+/* ================= spectrum ================= */
+.spectrum{padding:4px 0 2px}
+.axis{display:flex;justify-content:space-between;font-size:11px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--gray2);margin-bottom:14px}
+.spec-row{display:grid;grid-template-columns:132px 1fr;gap:18px;align-items:center;padding:13px 0}
+.spec-row+.spec-row{border-top:.5px solid var(--hairline)}
+.spec-row .who{font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:9px}
+.spec-row .who svg{width:15px;height:15px;color:var(--gray)}
+.spec-track{position:relative;height:30px}
+.spec-track::before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;
+  transform:translateY(-50%);border-radius:100px;
+  background:color-mix(in srgb,var(--hairline) 55%,transparent)}
+.spec-label{position:absolute;left:var(--pos);top:50%;transform:translate(-50%,-50%);
+  font-size:11.5px;font-weight:600;color:var(--ink);background:var(--card);
+  padding:5px 12px 5px 22px;border-radius:100px;white-space:nowrap;box-shadow:var(--shadow-sm)}
+.spec-label::before{content:"";position:absolute;left:9px;top:50%;transform:translateY(-50%);
+  width:7px;height:7px;border-radius:50%;background:var(--dotc,var(--accent))}
+.spec-row:nth-child(2) .spec-label{--dotc:var(--h3)}
+.spec-row:nth-child(3) .spec-label{--dotc:var(--h2)}
+.spec-row:nth-child(4) .spec-label{--dotc:var(--h4)}
+.spec-row:nth-child(5) .spec-label{--dotc:var(--h5)}
+.spec-row:nth-child(6) .spec-label{--dotc:var(--h1)}
+@media (max-width:620px){.spec-row{grid-template-columns:96px 1fr}.spec-label{font-size:10px;padding:4px 9px 4px 18px}}
 
-/* ---------- advisor entries ---------- */
-details.card{border-bottom:1px solid var(--rule)}
-details.card:first-of-type{border-top:1px solid var(--rule)}
+/* ================= advisor cards ================= */
+details.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);
+  margin:12px 0;overflow:hidden;transition:box-shadow .25s}
+details.card:hover{box-shadow:0 4px 12px rgba(0,0,0,.06),0 18px 44px rgba(0,0,0,.09)}
 details.card summary{list-style:none;cursor:pointer;display:grid;
-  grid-template-columns:auto auto 1fr auto auto;gap:14px;align-items:baseline;padding:17px 2px}
+  grid-template-columns:auto auto 1fr auto auto;gap:15px;align-items:center;padding:17px 22px}
 details.card summary::-webkit-details-marker{display:none}
-details.card summary:hover .cname{color:var(--accent)}
-.cico{align-self:center;display:grid;place-items:center;width:30px;height:30px;
-  border:1px solid var(--rule-strong);border-radius:50%;color:var(--ink)}
-.cico svg{width:14px;height:14px}
-.cname{font-size:16px;font-weight:600;white-space:nowrap;transition:color .2s}
-.cname small{display:block;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:9.5px;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:400;margin-top:2px}
-.cstance{font-size:13px;font-style:italic;color:var(--muted);overflow:hidden;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.model-chip{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:9.5px;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
-.chev{align-self:center;color:var(--faint);transition:transform .25s}
+.cico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;flex:none;
+  box-shadow:inset 0 -6px 12px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.25)}
+.cico svg{width:18px;height:18px}
+#council details.card:nth-of-type(1) .cico{background:linear-gradient(160deg,#ff6961,#d70015)}
+#council details.card:nth-of-type(2) .cico{background:linear-gradient(160deg,#3ca5ff,#0071e3)}
+#council details.card:nth-of-type(3) .cico{background:linear-gradient(160deg,#ffb340,#f56300)}
+#council details.card:nth-of-type(4) .cico{background:linear-gradient(160deg,#4cd964,#248a3d)}
+#council details.card:nth-of-type(5) .cico{background:linear-gradient(160deg,#bf5af2,#8944ab)}
+#council details.card:nth-of-type(6) .cico{background:linear-gradient(160deg,#40c8e0,#0071a4)}
+#review details.card .cico{background:linear-gradient(160deg,#8e8e93,#58585d)}
+.cname{font-size:15.5px;font-weight:650;letter-spacing:-.01em;white-space:nowrap}
+.cname small{display:block;font-size:11px;font-weight:500;color:var(--gray2);margin-top:1px}
+.cstance{font-size:13px;color:var(--gray);overflow:hidden;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical}
+.model-chip{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--gray2);background:var(--bg);border-radius:6px;padding:3px 8px}
+.chev{color:var(--gray2);transition:transform .3s cubic-bezier(.3,0,.2,1.4)}
 .chev svg{width:13px;height:13px}
 details[open] .chev{transform:rotate(90deg)}
-.cbody{padding:2px 2px 22px 44px;font-size:14.5px;color:color-mix(in srgb,var(--ink) 90%,var(--muted))}
+.cbody{padding:2px 24px 20px 75px;font-size:14.5px;color:color-mix(in srgb,var(--ink) 84%,var(--gray))}
 .cbody p{margin:10px 0}
-.xexam{margin-top:14px;padding:12px 0 0;border-top:1px dashed var(--rule-strong);font-size:13.5px}
-.xexam .k{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;
-  letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
-mark.verified,mark.recalled{background:none;color:inherit;font-style:italic;
-  border-bottom:1px dotted var(--accent)}
-mark.recalled{border-bottom-color:var(--faint)}
-sup.tag{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:8.5px;
-  letter-spacing:.06em;color:var(--accent);text-transform:uppercase}
-sup.tag.rec{color:var(--faint)}
+.xexam{margin-top:14px;padding:14px 16px;background:var(--bg);border-radius:var(--r-sm);font-size:13.5px}
+.xexam .k{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+mark.verified,mark.recalled{background:none;color:inherit;border-bottom:1.5px solid var(--h4);padding-bottom:1px}
+mark.recalled{border-bottom-color:var(--hairline)}
+sup.tag{font-size:8.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--h4)}
+sup.tag.rec{color:var(--gray2)}
 
-/* ---------- tally ---------- */
-.tally-head{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;
-  letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin:20px 0 8px}
-.tally-head:first-child{margin-top:2px}
-.tally-row{display:grid;grid-template-columns:172px 1fr auto;gap:16px;align-items:center;
-  padding:8px 0;border-bottom:1px solid var(--rule);font-size:14px}
-.tally-row .who{display:flex;align-items:center;gap:9px;font-weight:600}
-.tally-row .who svg{width:14px;height:14px}
-.dots{display:flex;gap:7px}
-.dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--rule-strong)}
-.dot.on{background:var(--accent);border-color:var(--accent)}
-.tally-n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;color:var(--muted)}
-.anon{margin-top:26px;padding-top:14px;border-top:1px dashed var(--rule-strong);
-  font-size:13px;font-style:italic;color:var(--muted)}
-.anon .k{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-style:normal;font-size:10px;
-  letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-right:8px}
+/* ================= tally ================= */
+.tally-head{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gray2);margin:22px 0 6px}
+.tally-head:first-child{margin-top:0}
+.tally-row{display:grid;grid-template-columns:170px 1fr auto;gap:16px;align-items:center;padding:11px 0}
+.tally-row+.tally-row{border-top:.5px solid var(--hairline)}
+.tally-row .who{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600}
+.tally-row .who svg{width:15px;height:15px;color:var(--gray)}
+.dots{display:flex;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%;background:color-mix(in srgb,var(--hairline) 60%,transparent)}
+.dot.on{background:linear-gradient(160deg,#3ca5ff,#0071e3);
+  box-shadow:0 1px 4px color-mix(in srgb,var(--accent) 40%,transparent)}
+.tally-n{font-size:13px;font-weight:700;color:var(--gray);font-variant-numeric:tabular-nums}
+.anon{margin-top:20px;padding:14px 18px;background:var(--bg);border-radius:var(--r-sm);
+  font-size:12.5px;color:var(--gray)}
+.anon .k{font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:10.5px;
+  color:var(--gray2);margin-right:8px}
 
-/* ---------- footer ---------- */
-.colophon{margin-top:70px}
-.colophon .rule{border:0;border-top:1px solid var(--ink);margin:0 0 3px}
-.colophon .rule2{border:0;border-top:2.5px solid var(--ink);margin:0 0 16px}
-.colophon p{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);line-height:2;margin:0}
-.colophon b{color:var(--ink);font-weight:600}
+/* ================= footer ================= */
+.colophon{text-align:center;margin-top:64px;color:var(--gray2);font-size:12px;line-height:2}
+.colophon .rule,.colophon .rule2{display:none}
+.colophon b{color:var(--gray);font-weight:600}
 
-/* ---------- print ---------- */
+/* ================= print ================= */
 @media print{
   .tabbar,.toolbar{display:none}
   .panel{display:block!important}
-  details.card{page-break-inside:avoid}
+  details.card{page-break-inside:avoid;box-shadow:none;border:.5px solid var(--hairline)}
   details.card:not([open]) .cbody{display:block}
-  body{background:#fff;font-size:12.5px}
-  .sec,.panel,.masthead{animation:none}
+  .card-box,.rec,.first{box-shadow:none;border:.5px solid var(--hairline)}
+  body{background:#fff}
+  .hero,.panel,.card-box,.rec,.first,.consult,.flagnote{animation:none}
 }
 </style>
 </head>
@@ -203,7 +210,7 @@ sup.tag.rec{color:var(--faint)}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="i-seal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M7.2 9.2l9.6 5.6M16.8 9.2 7.2 14.8"/></symbol>
-    <symbol id="i-agree" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.4 2.5 2.6 4.9-5.8"/></symbol>
+    <symbol id="i-agree" viewBox="0 0 24 24"><path d="m5 12.8 4.2 4.2L19 7"/></symbol>
     <symbol id="i-clash" viewBox="0 0 24 24"><path d="M4 8h10.5M14.5 8 11.3 4.8M14.5 8l-3.2 3.2"/><path d="M20 16H9.5M9.5 16l3.2-3.2M9.5 16l3.2 3.2"/></symbol>
     <symbol id="i-blind" viewBox="0 0 24 24"><path d="m4 4 16 16"/><path d="M9 5.6A10 10 0 0 1 12 5.2c5.4 0 8.9 4.6 10 6.8-.5 1-1.6 2.6-3.3 4M6.4 7C4.3 8.5 2.8 10.7 2 12c1.1 2.2 4.6 6.8 10 6.8 1.5 0 2.9-.4 4.1-1"/></symbol>
     <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m15.2 8.8-2 4.4-4.4 2 2-4.4Z"/></symbol>
@@ -222,12 +229,8 @@ sup.tag.rec{color:var(--faint)}
 </svg>
 
 <div class="wrap">
-  <header class="masthead">
-    <div class="mast-top">
-      <span class="seal"><svg class="gicon"><use href="#i-seal"/></svg> The LLM Council</span>
-      <span>Verdict · {{TIMESTAMP}}</span>
-    </div>
-    <hr class="mast-rule">
+  <header class="hero">
+    <div class="eyebrow">Council Verdict<span class="dateline">{{TIMESTAMP}}</span></div>
     <h1>{{QUESTION_TITLE}}</h1>
     <p class="dek">{{QUESTION_CONTEXT}}</p>
     <div class="metaline">
@@ -250,31 +253,32 @@ sup.tag.rec{color:var(--faint)}
     </div>
 
     <div id="verdictBody">
-      <div class="sec">
-        <div class="sec-head"><span class="sec-no">§1</span>
-          <h2><svg class="gicon"><use href="#i-agree"/></svg> Where the council agrees</h2><span class="fill"></span></div>
+      <div class="card-box">
+        <div class="sec-head"><span class="tile t-agree"><svg class="gicon"><use href="#i-agree"/></svg></span>
+          <h2>Where the council agrees<span class="sub">High-confidence signals — independent convergence</span></h2></div>
         {{VERDICT_AGREES}}
       </div>
-      <div class="sec">
-        <div class="sec-head"><span class="sec-no">§2</span>
-          <h2><svg class="gicon"><use href="#i-clash"/></svg> Where the council clashes</h2><span class="fill"></span></div>
+      <div class="card-box">
+        <div class="sec-head"><span class="tile t-clash"><svg class="gicon"><use href="#i-clash"/></svg></span>
+          <h2>Where the council clashes<span class="sub">Genuine disagreements, presented both ways</span></h2></div>
         {{VERDICT_CLASHES}}
       </div>
-      <div class="sec">
-        <div class="sec-head"><span class="sec-no">§3</span>
-          <h2><svg class="gicon"><use href="#i-blind"/></svg> Blind spots the review caught</h2><span class="fill"></span></div>
+      <div class="card-box">
+        <div class="sec-head"><span class="tile t-blind"><svg class="gicon"><use href="#i-blind"/></svg></span>
+          <h2>Blind spots the review caught<span class="sub">What no single advisor saw</span></h2></div>
         {{VERDICT_BLINDSPOTS}}
       </div>
     </div>
 
     <div class="rec">
-      <span class="k"><svg class="gicon"><use href="#i-compass"/></svg> The recommendation</span>
+      <div class="sec-head"><span class="tile t-rec"><svg class="gicon"><use href="#i-compass"/></svg></span>
+        <h2>The recommendation<span class="sub">A real answer — not "it depends"</span></h2></div>
       {{RECOMMENDATION}}
     </div>
 
     <div class="first">
       <span class="num">1</span>
-      <div><span class="k"><svg class="gicon" style="width:13px;height:13px"><use href="#i-step"/></svg> The one thing to do first</span>
+      <div><span class="k">The one thing to do first</span>
       <p>{{FIRST_STEP}}</p></div>
     </div>
 
@@ -284,44 +288,36 @@ sup.tag.rec{color:var(--faint)}
 
   <!-- ================= COUNCIL ================= -->
   <section class="panel" id="council">
-    <div class="sec">
-      <div class="sec-head"><span class="sec-no">§4</span>
-        <h2>Where each advisor landed</h2><span class="fill"></span></div>
+    <div class="card-box">
+      <div class="sec-head"><span class="tile t-rec"><svg class="gicon"><use href="#i-seal"/></svg></span>
+        <h2>Where each advisor landed<span class="sub">{{SPECTRUM_AXIS_LEFT}} ⟷ {{SPECTRUM_AXIS_RIGHT}}</span></h2></div>
       <div class="spectrum">
-        <div class="axis"><span>◀ {{SPECTRUM_AXIS_LEFT}}</span><span>{{SPECTRUM_AXIS_RIGHT}} ▶</span></div>
+        <div class="axis"><span>{{SPECTRUM_AXIS_LEFT}}</span><span>{{SPECTRUM_AXIS_RIGHT}}</span></div>
         {{SPECTRUM_ROWS}}
       </div>
     </div>
 
-    <div class="sec">
-      <div class="sec-head"><span class="sec-no">§5</span>
-        <h2>Full responses</h2><span class="fill"></span></div>
-      <div class="toolbar">
-        <button class="btn" onclick="toggleAll('council',true)">Expand all</button>
-        <button class="btn" onclick="toggleAll('council',false)">Collapse all</button>
-      </div>
-      {{ADVISOR_CARDS}}
+    <div class="toolbar">
+      <button class="btn" onclick="toggleAll('council',true)">Expand all</button>
+      <button class="btn" onclick="toggleAll('council',false)">Collapse all</button>
     </div>
+    {{ADVISOR_CARDS}}
   </section>
 
   <!-- ================= PEER REVIEW ================= -->
   <section class="panel" id="review">
-    <div class="sec">
-      <div class="sec-head"><span class="sec-no">§6</span>
-        <h2>How the blind review voted</h2><span class="fill"></span></div>
+    <div class="card-box">
+      <div class="sec-head"><span class="tile t-blind"><svg class="gicon"><use href="#i-reviewer"/></svg></span>
+        <h2>How the blind review voted<span class="sub">Reviewers never knew who wrote what</span></h2></div>
       {{REVIEW_TALLY}}
-    </div>
-
-    <div class="sec">
-      <div class="sec-head"><span class="sec-no">§7</span>
-        <h2>Reviewer notes</h2><span class="fill"></span></div>
-      <div class="toolbar">
-        <button class="btn" onclick="toggleAll('review',true)">Expand all</button>
-        <button class="btn" onclick="toggleAll('review',false)">Collapse all</button>
-      </div>
-      {{REVIEW_CARDS}}
       <div class="anon"><span class="k">Anonymization revealed</span>{{ANON_MAP}}</div>
     </div>
+
+    <div class="toolbar">
+      <button class="btn" onclick="toggleAll('review',true)">Expand all</button>
+      <button class="btn" onclick="toggleAll('review',false)">Collapse all</button>
+    </div>
+    {{REVIEW_CARDS}}
   </section>
 
   <footer class="colophon">
