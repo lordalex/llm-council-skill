@@ -1,163 +1,80 @@
-# LLM Council — v2 (subscription-native)
+<div align="center">
 
-A Claude Code skill. Run any high-stakes decision through 5 AI advisors who argue, peer-review each other anonymously, and hand you a verdict — **entirely on your Claude subscription**. No API keys, no OpenRouter, nothing leaves your machine (one opt-in exception: [Expert research mode](#the-expert-seat-automatic), off by default).
+# 🏛️ LLM Council
 
-Based on [Andrej Karpathy's LLM Council](https://x.com/karpathy/status/1962263486196867115); this v2 is a rework of the community skill by [@tenfoldmarc](https://github.com/tenfoldmarc/llm-council-skill).
+**Stop trusting Claude's first answer.**
+Run any high-stakes decision through 5 AI advisors who argue, peer-review each other **blind**, and hand you a verdict with a named dissent — entirely on your Claude subscription.
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-skill-d97757.svg)](https://claude.com/claude-code)
+[![No API keys](https://img.shields.io/badge/API%20keys-none-2ea44f.svg)](#design-decisions-and-why)
+[![Runs local](https://img.shields.io/badge/your%20data-stays%20local-2ea44f.svg)](#caveats--the-honest-list)
 
 <table><tr>
 <td width="50%"><img src="assets/report-dark.png" alt="Council verdict report — dark mode: glass cards, ring gauges, council split chart"></td>
 <td width="50%"><img src="assets/report-light.png" alt="Council verdict report — light mode"></td>
 </tr></table>
 
-*Real output from a real run — see [`examples/`](examples/).*
+*Real output from a real run — nothing staged. Full run in [`examples/`](examples/).*
 
-## Why this exists — and how it compares
+</div>
 
-Three ways to get a "council" verdict, honestly compared:
+---
 
-| | [Karpathy's llm-council](https://github.com/karpathy/llm-council) (app) | [tenfoldmarc skill](https://github.com/tenfoldmarc/llm-council-skill) (v1) | **this skill (v2)** |
-|---|---|---|---|
-| Diversity source | 4 vendors' models (GPT · Gemini · Claude · Grok) — true cross-model error-catching | one Claude, 5 personas | one Claude family: 5 lenses × per-seat model mix, plus an optional research-verified Expert |
-| Cost model | OpenRouter API credits, per token | Claude subscription | Claude subscription |
-| Setup | Python+uv, Node+npm, API key, prepaid credits | drop 1 file | copy 3 files |
-| Model control | edit `config.py` | none | 3-level per-seat control + lineup veto *before* spend |
-| Advisor panel | whatever models you list | fixed, marketing-flavored | 4 fixed lenses + domain-adaptive seat + conditional Expert with bespoke persona |
-| Fact-checking | strong — different vendors disagree | weak | weak by default; **strong opt-in** — research Expert tags `[verified: source]` vs `[recalled]` |
-| Knows its limits | no | no | *Consult Before Acting* names the human professional to see + the exact questions to ask |
-| Interactivity | web UI to browse stages | fire-and-forget | lineup veto · cross-examination · your lean challenged by the chairman |
-| Output | local web-app session | basic HTML | template-driven interactive briefing (tabs, spectrum, vote tally, dark mode) + full transcript |
-| Secrets | n/a (no workspace scan) | scans "any relevant file" | context scan explicitly skips `.env` / keys / tokens |
-| Privacy | your query goes to 4 external providers | local | local; the single exception (Expert research) is opt-in and shown in the lineup |
+**Why a council?** A single answer mirrors your framing — ask *"should I launch this?"* and you get reasons yes; ask *"is this a bad idea?"* and you get reasons no. The council forces five committed positions, reviews them **anonymized** so no voice can pull rank, and requires a chairman to name the disagreements instead of averaging them away. In the [sample run](examples/), the boldest advice ("quit your job now — the window is closing") was flagged **5/5 in blind review** as the weakest reasoning in the room. That correction is the product.
 
-**When Karpathy's original is genuinely better:** fact-heavy questions. Four different training sets catch hallucinations that five Claude lenses cannot — if you have OpenRouter credits and the question is "is this factually right?", his app is the stronger tool. **When this one is better:** judgment calls with real tradeoffs, zero marginal cost on your subscription, decisions that benefit from your workspace context, and any time you want per-seat control, an interrogable session, and a shareable artifact.
+Based on [Andrej Karpathy's LLM Council](https://github.com/karpathy/llm-council); reworked from the community skill by [@tenfoldmarc](https://github.com/tenfoldmarc/llm-council-skill).
 
-**vs. just asking Claude once:** a single answer mirrors your framing — ask "should I launch this?" and you get reasons yes; ask "is this a bad idea?" and you get reasons no. The council forces five committed positions, reviews them blind, and requires a chairman to name the disagreements instead of averaging them away.
-
-## Install
+## 60-second start
 
 ```bash
-# from this folder
+git clone https://github.com/lordalex/llm-council-skill
+cd llm-council-skill
 mkdir -p ~/.claude/skills/llm-council
 cp SKILL.md report-template.html journal-template.html council.config.json ~/.claude/skills/llm-council/
 ```
 
-Then restart Claude Code. (Already installed if you set this up via the assistant.)
-
-## Where to run it
-
-This skill needs real parallel sub-agents, a workspace to read your context and write files, and a preview to open the report. That means:
-
-| Surface | Works? | Best for |
-|---|---|---|
-| **Claude Code** (CLI / IDE) | ✅ full | Decisions *about a codebase you're in* — the context scan picks up the real repo + its `CLAUDE.md`. Architecture, migrations, refactors. |
-| **Claude Cowork** | ✅ full | Best default for non-code decisions — strategy, pricing, product, personal calls. Same sub-agents + workspace + inline report preview; pulls your `memory/`. |
-| **Claude.ai chat** | ⚠️ avoid | No real parallel sub-agents or persistent workspace — degrades to one model role-playing all five voices in a single context, which defeats the independence and anonymized peer review that are the whole point. |
-
-Code and Cowork read the **same** `~/.claude/skills/llm-council/` install — one install serves both. Pick by where your context lives: codebase decision → Code; everything else → Cowork.
-
-## Use
-
-Trigger it with your question:
-
-- `council this` · `run the council` · `pressure-test this` · `stress-test this` · `war room this` · `debate this`
+Restart Claude Code, then bring it a real decision:
 
 ```
 council this: should I quit my stable job to go all-in on my side project
 ($2k/month and growing), negotiate part-time, or keep grinding nights?
 ```
 
-You get a visual `council-report-[timestamp].html` (opens automatically) and a full `council-transcript-[timestamp].md`. See a **real sample run** in [`examples/`](examples/).
+Also triggers: `run the council` · `pressure-test this` · `stress-test this` · `war room this` · `debate this` · `council revisit` · `council journal`.
 
-## Usage cookbook — every pattern
+## What happens when you run it
 
-```text
-# ── the basics ─────────────────────────────────────────────
-council this: should we migrate this service to Supabase, or stay on Firebase?
-pressure-test this: my plan is to launch the beta to the waitlist next Friday.
-war room this: keep the agency client or go all-in on the product?
-
-# ── speed & cost dials ─────────────────────────────────────
-council this, quick: <decision>                    # skip all checkpoints, run straight through
-council this, keep it light: <decision>            # every seat on sonnet (cheapest sensible run)
-council this, quick, keep it light: <decision>     # both: fast + light
-council this, run it all on opus: <decision>       # maximum depth, highest usage
-council this, fastest: <decision>                  # every seat on haiku
-
-# ── per-seat model control ─────────────────────────────────
-council this, chairman on opus, everyone else sonnet: <decision>
-council this, contrarian and domain specialist on opus, reviewers on haiku: <decision>
-
-# ── the Expert seat ────────────────────────────────────────
-council this, with expert: <niche-domain decision>     # force-seat a drafted specialist
-council this, no expert: <pure judgment call>          # never seat one
-council this, with research: <fact-sensitive decision> # Expert may verify against real sources
-                                                       # ⚠ sends search queries off-machine — the one exception
-
-# ── combos that earn their keep ────────────────────────────
-council this, quick, all sonnet, no expert: <cheap second opinion>
-council this, with research, chairman on opus: <highest-stakes technical call>
+```mermaid
+flowchart LR
+    Q([Your decision]) --> F[Frame + classify<br/>+ lineup veto]
+    F --> A1[Contrarian]
+    F --> A2[First-Principles]
+    F --> A3[Strategist]
+    F --> A4[Executor]
+    F --> A5[Domain Specialist]
+    F -.->|when field-facts<br/>could flip it| A6[The Expert]
+    A1 & A2 & A3 & A4 & A5 & A6 --> X{{Anonymize A–F}}
+    X --> R[5 blind peer reviewers]
+    R --> C[Chairman verdict]
+    C --> OUT([Glass report + transcript<br/>+ decision journal])
 ```
 
-**Interactive flow** (anything without `quick`): you'll get the lineup veto → after the advisors respond, the option to cross-examine any of them → the option to state your own lean before the chairman rules. Answer or skip each — they're decision points, not paperwork.
+1. **Frame** — your question + safe workspace context (`CLAUDE.md`, `memory/`; never `.env`/keys) becomes one neutral brief. You see the model lineup **before anything spends usage**.
+2. **Convene** — five thinking lenses respond in parallel, each committed to its angle. The panel adapts: technical decisions seat a *Reliability & Security* specialist; product ones a *Market & Outsider*; personal ones *Opportunity-Cost & Values*.
+3. **Blind review** — responses are anonymized and cross-examined by five reviewers. Nobody can defer to a title.
+4. **Verdict** — the chairman names where the council agrees, where it clashes, what everyone missed, one recommendation, one first step — and may side with a well-argued minority.
 
-**Standing config per project** — drop a `council.config.json` next to the code:
+**You get:** an interactive glass report (opens automatically) · a full markdown transcript · a journal entry. ~2–4 minutes, 11–13 sub-agent calls on your plan.
 
-```json
-{ "models": { "reviewers": "haiku" }, "expert": "always", "expert_research": "off" }
-```
+## The feature tour
 
-**Re-councilling:** run the same question again after acting on the verdict — the skill reads previous transcripts in the folder and won't re-tread settled ground.
+### 🎛️ You pick every seat's model
+Three levels, highest wins: **inline** (`council this, chairman on opus, reviewers on haiku: …`) → **project** `council.config.json` → **global** `~/.claude/skills/llm-council/council.config.json`. Valid: `opus` · `sonnet` · `haiku` · `fable` · `default`. Shortcuts: `run it all on opus` / `keep it light` / `fastest`. The lineup echo shows the resolved seats before any spend — veto anytime.
 
-## The decision journal — does your council have a track record?
+Session model and council models are independent layers: run your chat on Opus while the 11 council calls run on Sonnet. The skill never routes to an external LLM API — every seat is Claude, on your subscription.
 
-Every run is logged to `council-journal.json` and rendered into `council-journal.html` — a glass dashboard of every council: question, verdict, consensus/confidence/dissent, links to the full report.
-
-Then the accountability loop:
-
-```
-council revisit: the quit-my-job decision
-```
-
-You tell the council what actually happened; a single sub-agent scores the original recommendation — **hit / miss / mixed** — names which advisor's position aged best, and extracts one transferable lesson. The journal tracks the hit rate over time. After ten decisions you know something nobody else can tell you: *whether your council is actually right, and which lens to trust on which kind of call.* A council that can't admit misses is a horoscope — this one keeps score.
-
-## Interactive sessions (default in Code / Cowork)
-
-The council is a session, not a vending machine. Three light checkpoints — say **`quick`** in the trigger to skip them all:
-
-1. **Lineup veto** — see seats, models, and the Expert persona *before* anything spends usage.
-2. **Cross-examination** — after the advisors respond, pick any of them and ask a follow-up. Your question goes to *that same advisor with its full context intact*, so it defends its actual position. Its answers enter the peer-review round.
-3. **Your lean** — before the chairman rules, optionally state your own position. The verdict must engage with it head-on: if the council agrees, it says what you're still underweighting; if it disagrees, it names the strongest reason your lean fails.
-
-## The report
-
-Every run fills the shipped [`report-template.html`](report-template.html) — designed on Apple's philosophy: whitespace used deliberately, white cards floating on the signature `#f5f5f7` gray, soft diffuse shadows instead of borders, one blue accent used with discipline, and SF Pro rendering natively on Apple devices (`-apple-system`, no webfonts):
-
-- **Frosted glass everywhere** — every card is translucent with backdrop blur, floating over a soft ambient color field (visionOS-style); the glass reads especially well in dark mode
-- **Dashboard ring gauges** — three animated Apple-Watch-style rings: Consensus, Confidence, and Dissent, derived honestly from the run
-- **Council-split bar chart** — one glance shows how the seats divided (now / later / reframe / don't)
-- **Centered hero** — eyebrow label, large tracking-tight headline, quiet subtitle, glass meta chips
-- **Frosted-glass segmented control** (iOS-style) for Verdict / The Council / Peer Review, keyboard `1`–`3`
-- **Gradient icon tiles** (iOS Settings-style) with white SVG stroke glyphs — per-section and per-advisor color identity, no emoji, no images
-- **Rounded-rail spectrum** — each advisor as a floating pill marker on the decision axis
-- **Dot-matrix blind-vote tally** with soft-glow filled dots
-- White advisor cards with hover lift, stance previews, model tags, cross-examination threads inset
-- Tinted feature cards: blue-gradient **first step** with an oversized numeral, red **Consult Before Acting**, amber verify-flags; `[verified]`/`[recalled]` as green/neutral underline citations
-- **Automatic dark mode** (true-black, iOS dark palette), print/PDF stylesheet, copy-verdict button, staggered load animations, zero external assets — works offline forever
-
-*(Preview: open [`examples/quit-job-for-side-project.report.html`](examples/quit-job-for-side-project.report.html) in a browser.)*
-
-## Choose the model for each council member
-
-Three ways, highest precedence first:
-
-1. **Inline, per run** — say it in the trigger:
-   - `council this, chairman on opus, everyone else sonnet: …`
-   - `council this, contrarian and domain specialist on opus, reviewers on haiku: …`
-   - shortcuts: `run it all on opus` · `keep it light` (all sonnet) · `fastest` (all haiku)
-2. **Per project** — drop a `council.config.json` in the project root; overrides your global default there.
-3. **Global default** — edit [`~/.claude/skills/llm-council/council.config.json`](~/.claude/skills/llm-council/council.config.json) (pre-filled). This is your standing lineup everywhere.
-
-Config schema — every key optional, `reviewers` covers all 5 reviewers:
+<details><summary><b>Full config schema</b></summary>
 
 ```json
 {
@@ -175,73 +92,135 @@ Config schema — every key optional, `reviewers` covers all 5 reviewers:
   "expert_research": "off"
 }
 ```
+Every key optional; `reviewers` sets all five at once. Model names are aliases resolving to current versions; anything unavailable on your plan falls back to `default` and is noted in the report footer.
+</details>
 
-Valid values: `opus` · `sonnet` · `haiku` · `fable` · `default`. All are Claude models on your subscription — nothing routes to a paid external API. The council **echoes the resolved lineup before each run** so you can veto it before it spends usage.
+### 🔬 The Expert — a sixth chair, seated only when it matters
+During framing the council asks itself: *does this verdict hinge on facts of a specialized field, or purely on judgment?* If facts could flip it, it **drafts a bespoke persona from your question** ("a Postgres RLS security engineer who has run three Firebase migrations") and seats it. The Expert enters peer review **blind** — it wins on merit, not title.
 
-## The Expert seat (automatic)
+With `with research` (or `"expert_research": "on"`), The Expert alone may verify claims against real sources and must tag every claim `[verified: source]` or `[recalled]` — the chairman weights them differently and tells you which load-bearing facts are which. **Research is off by default**: it's the one thing that would send data (search-query text) off your machine, so it never turns on silently. Controls: `with expert` · `no expert` · `with research` · config `"expert": auto|always|never`.
 
-Beyond the five lenses, the council can seat a **sixth chair: The Expert** — and it's fully automated. During framing, the orchestrator asks: *does this verdict hinge on facts of a specialized field, or purely on judgment?* Judgment-only questions run the classic five. If field-facts could flip the verdict (auth migration mechanics, tax/legal structure, a niche market's norms), it:
+### 💬 Interactive by default — it's a session, not a vending machine
+Three light checkpoints (say `quick` to skip all):
+1. **Lineup veto** — seats, models, Expert persona, research state, before spend.
+2. **Cross-examination** — interrogate any advisor after Stage 1; your question goes to *that same sub-agent with full context*, and its defense enters the peer review.
+3. **Your lean** — state your position before the verdict; the chairman must engage it head-on — what you're underweighting if it agrees, the strongest reason you're wrong if it doesn't.
 
-1. **Drafts a bespoke persona from your question** — e.g. "a Postgres RLS security engineer who has run three Firebase migrations" — never a canned menu, and shows it in the lineup echo before spending anything.
-2. **Enters peer review blind** — reviewers never know which response is "the expert," so it wins on merit, not title.
-3. **Can optionally *verify* instead of recall.** With research enabled, The Expert alone may search the web / fetch docs / read your codebase, and must tag every claim `[verified: <source>]` or `[recalled]`. The chairman weights verified claims above recalled ones and says which load-bearing facts are which.
+### 🛑 It knows what isn't its call
+When a verdict hinges on legal / tax / medical / regulatory terrain — or on a human whose stake is material — it ends with **Consult Before Acting**: the *kind* of person to see and 2–3 verbatim questions to bring them. Rare by design; in the sample run it sent the user to their **partner** with three financial stress-test questions. And every single-source factual claim gets flagged *verify, don't trust*.
 
-**Research is OFF by default** — it's the one thing that would send data (search-query text) off your machine, so it never turns on silently. Enable per run with `council this, with research: …` or standing via config.
+### 📊 The report
+Fills the shipped [`report-template.html`](report-template.html) — deterministic design, zero improvisation, zero external assets, works offline forever. Frosted-glass cards over an ambient color field · three animated ring gauges (**Consensus / Confidence / Dissent**, derived honestly per run) · council-split bar chart · position spectrum · dot-matrix blind-vote tally · iOS-style gradient icon tiles · segmented-control tabs (keys `1`–`3`) · true-black automatic dark mode · print/PDF · copy-verdict. *(Preview: open [`examples/quit-job-for-side-project.report.html`](examples/quit-job-for-side-project.report.html) in a browser.)*
 
-Control it like everything else:
+### 📓 The decision journal — does your council have a track record?
+Every run logs to `council-journal.json` and renders `council-journal.html`: every council, its verdict, its gauges, its links. Then the accountability loop:
 
-| Config | Values | Meaning |
+```
+council revisit: the quit-my-job decision
+```
+
+You say what actually happened; one sub-agent scores the original recommendation **hit / miss / mixed**, names which advisor's position aged best, and extracts one transferable lesson. The journal tracks the hit rate. After ten decisions you know something nobody else can tell you: *whether your council is actually right, and which lens to trust on which kind of call.* A council that can't admit misses is a horoscope — this one keeps score.
+
+## Cookbook — every pattern
+
+```text
+# ── the basics ─────────────────────────────────────────────
+council this: <decision with real stakes and context>
+pressure-test this: my plan is to launch the beta to the waitlist next Friday.
+war room this: keep the agency client or go all-in on the product?
+
+# ── speed & cost dials ─────────────────────────────────────
+council this, quick: <decision>                    # skip all checkpoints
+council this, keep it light: <decision>            # every seat on sonnet
+council this, run it all on opus: <decision>       # maximum depth
+council this, fastest: <decision>                  # every seat on haiku
+
+# ── per-seat model control ─────────────────────────────────
+council this, chairman on opus, everyone else sonnet: <decision>
+council this, contrarian and domain specialist on opus, reviewers on haiku: <decision>
+
+# ── the Expert seat ────────────────────────────────────────
+council this, with expert: <niche-domain decision>
+council this, no expert: <pure judgment call>
+council this, with research: <fact-sensitive decision>   # ⚠ queries leave the machine
+
+# ── combos that earn their keep ────────────────────────────
+council this, quick, all sonnet, no expert: <cheap second opinion>
+council this, with research, chairman on opus: <highest-stakes technical call>
+
+# ── the track record ───────────────────────────────────────
+council revisit: <a past decision>                 # score the verdict vs reality
+council journal                                    # open the dashboard
+```
+
+**Per-project standing config:** drop a `council.config.json` next to the code — e.g. `{ "models": { "reviewers": "haiku" }, "expert": "always" }`. **Re-councilling:** ask again after acting; the skill reads prior transcripts and won't re-tread settled ground.
+
+## Where to run it
+
+| Surface | Verdict | Why |
 |---|---|---|
-| `"expert"` | `auto` (default) · `always` · `never` | Whether the seat gets filled |
-| `"expert_research"` | `off` (default) · `on` | Whether The Expert may verify against external sources |
-| `"models": { "expert": … }` | `opus` (default) · `sonnet` · `haiku` · `fable` | The Expert's model |
+| **Claude Code** (CLI / IDE) | ✅ full | Decisions *about a codebase you're in* — the context scan reads the real repo. |
+| **Claude Cowork** | ✅ full | Best default for everything else — strategy, pricing, personal calls; pulls your `memory/`, previews the report inline. |
+| **Claude.ai chat** | ⚠️ avoid | No true parallel sub-agents — degrades to one voice doing five impressions, which defeats the blind review entirely. |
 
-Inline: `with expert` · `no expert` · `with research`.
+One install serves Code and Cowork. **Good councils:** pricing, positioning, architecture, migrations, pivots, "which of these N", "am I crazy". **Skip it for:** factual lookups, pure creation ("write me a tweet"), summaries, validation-seeking.
 
-### How model selection actually works
+## How it compares
 
-The `SKILL.md` doesn't set any model — the **orchestrator** (the main agent running the skill) does, by passing a `model` parameter when it spawns each advisor as a sub-agent. So there are two independent layers:
+| | [Karpathy's app](https://github.com/karpathy/llm-council) | [v1 skill](https://github.com/tenfoldmarc/llm-council-skill) | **this skill (v2)** |
+|---|---|---|---|
+| Diversity source | 4 vendors' models — true cross-model error-catching | one Claude, 5 personas | one Claude family: 5 lenses × per-seat models + optional research-verified Expert |
+| Cost | OpenRouter credits, per token | subscription | subscription |
+| Setup | Python+uv, Node+npm, API key, prepaid credits | drop 1 file | copy 4 files |
+| Model control | edit `config.py` | none | 3-level per-seat + lineup veto before spend |
+| Advisor panel | whatever you list | fixed, marketing-flavored | 4 lenses + domain-adaptive seat + conditional Expert |
+| Fact-checking | strong — vendors disagree | weak | weak by default; **strong opt-in** — `[verified]` vs `[recalled]` |
+| Knows its limits | no | no | Consult Before Acting + single-source claim flags |
+| Interactivity | web UI to browse stages | fire-and-forget | veto · cross-examination · your lean challenged |
+| Track record | none | none | decision journal + revisit scoring (hit/miss/mixed) |
+| Output | local web app | basic HTML | glass interactive briefing + transcript + journal |
+| Privacy | query goes to 4 providers | local | local; one opt-in exception (Expert research), always visible |
 
-- **Session / orchestrator model** — whatever you picked in the app (e.g. Opus 4.8). Runs the framing, anonymization, and report-writing. Only your model picker changes this.
-- **Council-seat models** — per-sub-agent overrides, resolved from the precedence above and passed on each spawn, *independent* of your session model.
-
-Because they're independent, **running on Opus 4.8 and asking for Sonnet advisors works**: the orchestration stays on Opus while the 11 council sub-agents run on Sonnet. (`keep it light` / `use sonnet` changes the council, not your top-level session.) Friendly names map to current versions — `sonnet`→Sonnet 5, `opus`→Opus 4.8, `haiku`→Haiku 4.5, `fable`→Fable 5. If a model isn't on your plan it falls back to `default` and notes it in the transcript footer.
-
-## When to use
-
-Good: pricing, positioning, architecture, migrations, pivots, "which of these N", "am I crazy". Skip: factual lookups, pure creation ("write me a tweet"), summaries, or validation-seeking when you already know the answer.
+**Be honest about the tradeoff:** Karpathy's original is genuinely better for fact-heavy questions — four different training sets catch hallucinations five Claude lenses can't. This one is better for judgment calls with real tradeoffs, zero marginal cost, workspace context, per-seat control, an interrogable session, and a track record.
 
 ## Caveats — the honest list
 
-1. **Persona diversity ≠ model diversity.** All advisors are Claude; they share a knowledge base and can share a wrong assumption. The structure catches reasoning gaps well and factual errors poorly. When facts are load-bearing, add `with research`.
-2. **A full run is real usage** — 11–13 sub-agent calls against your plan limits (~2–4 minutes). Don't council trivia; that's what the trigger guards are for.
-3. **Research mode is the one privacy exception.** It sends search-query text (derived from your question) off your machine. It is off by default, never turns on silently, and the lineup echo shows `(research on)` before anything spends.
-4. **The context scan reads your files.** `CLAUDE.md`, `memory/`, referenced files go into sub-agent prompts (locally). It skips `.env`/keys/tokens by rule — but keep genuinely sensitive notes out of scanned folders.
-5. **A confident verdict can still be wrong.** The chairman flags uncorroborated claims, but it can't catch what all six voices believe incorrectly. For high-stakes calls, read the transcript, not just the verdict.
-6. **The chairman may overrule the majority** when a dissenter's reasoning is strongest. That's a feature — but it means the verdict isn't a vote count; check its stated reasoning.
-7. **Claude.ai chat is not supported.** No true parallel sub-agents there — it degrades to one voice doing impressions. Use Code or Cowork.
-8. **Files are written to your workspace** and the report auto-opens. Outputs match `council-report-*` / `council-transcript-*`; add those patterns to `.gitignore` in repos where you run it (this repo ships them).
-9. **Model names are aliases** (`opus`, `sonnet`, `haiku`, `fable`) resolving to current versions; anything unavailable on your plan silently falls back to `default` and is noted in the report footer.
-10. **Trigger phrases can misfire** in rare edge cases. When you definitely want a council, say `council this:` explicitly.
+1. **Persona diversity ≠ model diversity.** All advisors are Claude; they can share a wrong assumption. Great at reasoning gaps, weak as a fact-checker — add `with research` when facts are load-bearing.
+2. **A full run is real usage** — 11–13 sub-agent calls (~2–4 min) against your plan. Don't council trivia.
+3. **Research mode is the one privacy exception** — off by default, never silent, `(research on)` always shown in the lineup first.
+4. **The context scan reads your files** (locally) — `CLAUDE.md`, `memory/`, referenced files. It skips `.env`/keys/tokens by rule; still, keep truly sensitive notes out of scanned folders.
+5. **A confident verdict can still be wrong.** The chairman flags uncorroborated claims but can't catch what all six voices believe incorrectly. High stakes → read the transcript, not just the verdict.
+6. **The chairman may overrule the majority** when a dissenter argues best. Feature, not bug — but check its stated reasoning.
+7. **Files are written to your workspace** and the report auto-opens. Add `council-*` patterns to `.gitignore` in repos where you run it (this repo ships them).
+8. **Trigger phrases can misfire** in edge cases — say `council this:` explicitly when you definitely want one.
 
 ## Design decisions (and why)
 
-The choices behind v2, so future contributors don't relitigate them blind:
-
 | Decision | Choice | Why |
 |---|---|---|
-| Runtime | Subscription-only; never routes to external LLM APIs | Predictable cost was the point — the original app burns prepaid API credits per query |
-| Expert research | **Off by default**, opt-in per run or config | Preserves "nothing leaves your machine" unless you explicitly trade it for verification |
-| Expert seating | `auto` — the orchestrator decides per question | Zero user burden; seats only when field-facts could flip the verdict |
-| Human escalation | *Consult Before Acting* included, **rare by design** | A council that says "see a professional" on every run trains you to ignore it |
-| Name | Kept `llm-council` (`war-room` was considered) | Karpathy made it a searchable term; the honesty about lenses-vs-models lives in the docs instead |
-| Interactivity | On by default; `quick` opt-out | A council should be interrogable; the escape hatch keeps automation/headless use possible |
-| Report | Shipped template, tokens filled per run | A deterministic rich interface beats per-run design improvisation |
-| Examples | Real runs, unedited | You should judge actual output, not marketing |
+| Runtime | Subscription-only; never routes to external LLM APIs | Predictable cost was the whole point |
+| Expert research | Off by default, opt-in | "Nothing leaves your machine" holds unless you trade it for verification |
+| Expert seating | `auto` | Zero user burden; seated only when field-facts could flip the verdict |
+| Human escalation | Included, rare by design | A council that always says "see a professional" trains you to ignore it |
+| Name | Kept `llm-council` (`war-room` considered) | Karpathy made it searchable; honesty lives in the docs |
+| Interactivity | Default on; `quick` opt-out | Interrogable by default, automatable on demand |
+| Report | Shipped template, tokens filled per run | Deterministic quality beats per-run improvisation |
+| Examples | Real runs, unedited | Judge actual output, not marketing |
 | Deferred | "Include me" blind mode, rebuttal rounds | Good ideas awaiting a real need — PRs welcome |
+
+## Repo map
+
+| File | Role |
+|---|---|
+| [`SKILL.md`](SKILL.md) | The entire skill — orchestration, prompts, guardrails |
+| [`report-template.html`](report-template.html) · [`journal-template.html`](journal-template.html) | Shipped report + journal designs (token-filled per run) |
+| [`council.config.json`](council.config.json) | Your standing lineup + expert policy |
+| [`examples/`](examples/) | A real, unedited run: transcript + report |
+| [`scripts/check_contract.py`](scripts/check_contract.py) | Keeps templates ↔ SKILL.md token docs in sync — run before PRs |
 
 ## Credit
 
-Methodology: Andrej Karpathy. Original Claude Code adaptation: @olelehmann / @tenfoldmarc. v2 rework — made with ♥ by **LordAlex Leon**.
+Methodology: [Andrej Karpathy](https://github.com/karpathy/llm-council). Original Claude Code adaptation: [@olelehmann](https://x.com/olelehmann) / [@tenfoldmarc](https://github.com/tenfoldmarc/llm-council-skill).
+v2 rework — made with ♥ by **LordAlex Leon**.
 
-MIT.
+MIT — do whatever you want with it.
