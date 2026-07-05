@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# logs
+*.log
+
+# generated council outputs (created at runtime in each workspace)
+council-report-*.html
+council-transcript-*.md

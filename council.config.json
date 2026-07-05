@@ -1,0 +1,12 @@
+{
+  "_comment": "Per-seat model for the LLM Council. Edit values freely. Valid: opus | sonnet | haiku | fable | default. Omit a key to use the built-in default. 'reviewers' sets all 5 peer reviewers. Precedence: inline message override > project ./council.config.json > this global file > built-in defaults.",
+  "models": {
+    "contrarian": "opus",
+    "first_principles": "opus",
+    "strategist": "sonnet",
+    "executor": "sonnet",
+    "domain_specialist": "opus",
+    "reviewers": "sonnet",
+    "chairman": "opus"
+  }
+}
