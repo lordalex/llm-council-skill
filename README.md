@@ -112,7 +112,10 @@ The council is a session, not a vending machine. Three light checkpoints — say
 
 Every run fills the shipped [`report-template.html`](report-template.html) — designed on Apple's philosophy: whitespace used deliberately, white cards floating on the signature `#f5f5f7` gray, soft diffuse shadows instead of borders, one blue accent used with discipline, and SF Pro rendering natively on Apple devices (`-apple-system`, no webfonts):
 
-- **Centered hero** — eyebrow label, large tracking-tight headline, quiet subtitle, pill meta chips
+- **Frosted glass everywhere** — every card is translucent with backdrop blur, floating over a soft ambient color field (visionOS-style); the glass reads especially well in dark mode
+- **Dashboard ring gauges** — three animated Apple-Watch-style rings: Consensus, Confidence, and Dissent, derived honestly from the run
+- **Council-split bar chart** — one glance shows how the seats divided (now / later / reframe / don't)
+- **Centered hero** — eyebrow label, large tracking-tight headline, quiet subtitle, glass meta chips
 - **Frosted-glass segmented control** (iOS-style) for Verdict / The Council / Peer Review, keyboard `1`–`3`
 - **Gradient icon tiles** (iOS Settings-style) with white SVG stroke glyphs — per-section and per-advisor color identity, no emoji, no images
 - **Rounded-rail spectrum** — each advisor as a floating pill marker on the decision axis
@@ -219,6 +222,6 @@ The choices behind v2, so future contributors don't relitigate them blind:
 
 ## Credit
 
-Methodology: Andrej Karpathy. Original Claude Code adaptation: @olelehmann / @tenfoldmarc. v2 rework: LordAlex.
+Methodology: Andrej Karpathy. Original Claude Code adaptation: @olelehmann / @tenfoldmarc. v2 rework — made with ♥ by **LordAlex Leon**.
 
 MIT.

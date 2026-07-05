@@ -334,6 +334,10 @@ Token reference (all HTML-safe strings; fill empty string where noted):
 | `{{DECISION_TYPE}}` | `technical / infrastructure`, `product / go-to-market`, or `strategic / personal` |
 | `{{TIMESTAMP}}` | Human-readable run time |
 | `{{LINEUP_CHIPS}}` | One `<span class="chip">Seat · model</span>` per seat (incl. Expert + research state when seated) |
+| `{{STAT_CONSENSUS}}` | Whole number 0–100: how much of the verdict rests on independent convergence (all-agree points high, split council low) |
+| `{{STAT_CONFIDENCE}}` | Whole number 0–100: the chairman's certainty in the recommendation |
+| `{{STAT_DISSENT}}` | Whole number 0–100: strength of the strongest opposing case (a well-argued dissent scores high even if outvoted) |
+| `{{POSITION_SPLIT}}` | Split-bar widget: `<div class="splitbar">` with one `<span class="seg" style="--w:NN%;--c:var(--hN)">` per position camp, then `<div class="legend">` with `<span class="li"><span class="sw" style="--c:var(--hN)"></span>Label <b>count</b></span>` per camp. Derive camps from advisor verdicts (e.g. now / later / reframe / don't) |
 | `{{SPECTRUM_AXIS_LEFT}}` / `{{SPECTRUM_AXIS_RIGHT}}` | The two poles of the decision (e.g. "Migrate now" / "Don't migrate") |
 | `{{SPECTRUM_ROWS}}` | One per advisor: `<div class="spec-row"><div class="who"><svg class="gicon"><use href="#i-…"/></svg>Name</div><div class="spec-track"><span class="spec-label" style="--pos:NN%">≤6-word stance</span></div></div>` |
 | `{{VERDICT_AGREES}}` / `{{VERDICT_CLASHES}}` / `{{VERDICT_BLINDSPOTS}}` | Chairman sections as `<p>`/`<ul>` HTML |
@@ -347,7 +351,9 @@ Token reference (all HTML-safe strings; fill empty string where noted):
 | `{{ANON_MAP}}` | The revealed letter→advisor mapping line |
 | `{{FOOTER_MODELS}}` | Full lineup with models, decision type, research state |
 
-**Icon sprite** — the template ships an inline SVG symbol set; reference icons with `<svg class="gicon"><use href="#id"/></svg>`. Advisor ids: `i-contrarian`, `i-first`, `i-strategist`, `i-executor`, `i-domain`, `i-expert`, `i-reviewer`. Utility ids: `i-agree`, `i-clash`, `i-blind`, `i-compass`, `i-step`, `i-human`, `i-warn`, `i-chev`, `i-seal`. Use these — never emoji — in any content you inject.
+**Dashboard stats** — derive the three ring-gauge numbers yourself from the run, honestly: consensus from how much of the verdict rests on unanimous/majority convergence; confidence from the chairman's stated certainty; dissent from the strength (not the vote count) of the best opposing case. Never invent precision — round numbers are fine.
+
+**Icon sprite** — the template ships an inline SVG symbol set; reference icons with `<svg class="gicon"><use href="#id"/></svg>`. Advisor ids: `i-contrarian`, `i-first`, `i-strategist`, `i-executor`, `i-domain`, `i-expert`, `i-reviewer`. Utility ids: `i-agree`, `i-clash`, `i-blind`, `i-compass`, `i-step`, `i-human`, `i-warn`, `i-chev`, `i-seal`, `i-heart`. Use these — never emoji — in any content you inject.
 
 **Fallback** (only if the template file is missing): generate a single self-contained HTML file in the same Apple-minimal style — luminous `#f5f5f7` background, white cards with large radii and soft diffuse shadows (no borders), generous whitespace, `-apple-system` type with a large tracking-tight hero headline, ONE blue accent used sparingly, iOS-style gradient icon tiles with white SVG stroke glyphs (no emoji), a frosted-glass segmented control for tabs, a rounded-rail spectrum with pill markers, dot-matrix vote tally, tinted feature cards (blue = first step, red = Consult Before Acting, amber = verify flags), dark-mode via `prefers-color-scheme`, print stylesheet, zero external assets.
 
