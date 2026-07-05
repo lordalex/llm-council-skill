@@ -107,12 +107,8 @@ h1{font-size:clamp(30px,5.4vw,46px);line-height:1.09;font-weight:700;letter-spac
 .ring circle{fill:none;stroke-width:11;stroke-linecap:round}
 .ring .bgc{stroke:color-mix(in srgb,var(--glow) 14%,var(--hairline) 30%)}
 .ring .fgc{stroke-dasharray:295.3;stroke-dashoffset:295.3;
-  filter:drop-shadow(0 0 7px color-mix(in srgb,var(--glow) 65%,transparent))
-         drop-shadow(0 2px 3px color-mix(in srgb,var(--glow) 35%,transparent));
   transition:stroke-dashoffset 1.4s cubic-bezier(.32,1.16,.35,1)}
-.stat:hover .fgc{filter:drop-shadow(0 0 12px color-mix(in srgb,var(--glow) 85%,transparent))
-         drop-shadow(0 2px 4px color-mix(in srgb,var(--glow) 45%,transparent))}
-.stat-n{position:absolute;inset:0;display:grid;place-items:center;
+.stat-n{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:1px;
   font-size:31px;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums;
   background:linear-gradient(160deg,var(--gA),var(--gB));
   -webkit-background-clip:text;background-clip:text;color:transparent}
