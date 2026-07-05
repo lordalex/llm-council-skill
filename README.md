@@ -4,6 +4,13 @@ A Claude Code skill. Run any high-stakes decision through 5 AI advisors who argu
 
 Based on [Andrej Karpathy's LLM Council](https://x.com/karpathy/status/1962263486196867115); this v2 is a rework of the community skill by [@tenfoldmarc](https://github.com/tenfoldmarc/llm-council-skill).
 
+<table><tr>
+<td width="50%"><img src="assets/report-dark.png" alt="Council verdict report — dark mode: glass cards, ring gauges, council split chart"></td>
+<td width="50%"><img src="assets/report-light.png" alt="Council verdict report — light mode"></td>
+</tr></table>
+
+*Real output from a real run — see [`examples/`](examples/).*
+
 ## Why this exists — and how it compares
 
 Three ways to get a "council" verdict, honestly compared:
@@ -31,7 +38,7 @@ Three ways to get a "council" verdict, honestly compared:
 ```bash
 # from this folder
 mkdir -p ~/.claude/skills/llm-council
-cp SKILL.md report-template.html council.config.json ~/.claude/skills/llm-council/
+cp SKILL.md report-template.html journal-template.html council.config.json ~/.claude/skills/llm-council/
 ```
 
 Then restart Claude Code. (Already installed if you set this up via the assistant.)
@@ -99,6 +106,18 @@ council this, with research, chairman on opus: <highest-stakes technical call>
 ```
 
 **Re-councilling:** run the same question again after acting on the verdict — the skill reads previous transcripts in the folder and won't re-tread settled ground.
+
+## The decision journal — does your council have a track record?
+
+Every run is logged to `council-journal.json` and rendered into `council-journal.html` — a glass dashboard of every council: question, verdict, consensus/confidence/dissent, links to the full report.
+
+Then the accountability loop:
+
+```
+council revisit: the Firebase migration decision
+```
+
+You tell the council what actually happened; a single sub-agent scores the original recommendation — **hit / miss / mixed** — names which advisor's position aged best, and extracts one transferable lesson. The journal tracks the hit rate over time. After ten decisions you know something nobody else can tell you: *whether your council is actually right, and which lens to trust on which kind of call.* A council that can't admit misses is a horoscope — this one keeps score.
 
 ## Interactive sessions (default in Code / Cowork)
 

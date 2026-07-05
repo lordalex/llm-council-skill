@@ -1,6 +1,6 @@
 ---
 name: llm-council
-description: "Run any high-stakes question, idea, or decision through a council of 5 AI advisors who independently analyze it, peer-review each other anonymously, and synthesize a final verdict. Runs entirely on your Claude subscription via sub-agents — no API keys, no external services. Adapts its advisor panel to the decision type (technical / product / strategic). Based on Karpathy's LLM Council methodology. MANDATORY TRIGGERS: 'council this', 'run the council', 'war room this', 'pressure-test this', 'stress-test this', 'debate this'. STRONG TRIGGERS (use when combined with a real decision or tradeoff): 'should I X or Y', 'which option', 'what would you do', 'is this the right move', 'validate this', 'get multiple perspectives', 'I can't decide', 'I'm torn between'. Do NOT trigger on simple yes/no questions, factual lookups, or casual 'should I' without a meaningful tradeoff (e.g. 'should I use markdown' is not a council question). DO trigger when the user presents a genuine decision with stakes, multiple options, and context that suggests they want it pressure-tested from multiple angles."
+description: "Run any high-stakes question, idea, or decision through a council of 5 AI advisors who independently analyze it, peer-review each other anonymously, and synthesize a final verdict. Runs entirely on your Claude subscription via sub-agents — no API keys, no external services. Adapts its advisor panel to the decision type (technical / product / strategic). Based on Karpathy's LLM Council methodology. MANDATORY TRIGGERS: 'council this', 'run the council', 'war room this', 'pressure-test this', 'stress-test this', 'debate this', 'council revisit' (score a past council verdict against what actually happened), 'council journal' (open/rebuild the decision journal). STRONG TRIGGERS (use when combined with a real decision or tradeoff): 'should I X or Y', 'which option', 'what would you do', 'is this the right move', 'validate this', 'get multiple perspectives', 'I can't decide', 'I'm torn between'. Do NOT trigger on simple yes/no questions, factual lookups, or casual 'should I' without a meaningful tradeoff (e.g. 'should I use markdown' is not a council question). DO trigger when the user presents a genuine decision with stakes, multiple options, and context that suggests they want it pressure-tested from multiple angles."
 ---
 
 # LLM Council (v2 — subscription-native, domain-adaptive)
@@ -363,13 +363,41 @@ Save `council-transcript-[timestamp].md` in the same location: original question
 
 ---
 
+### step 7: update the decision journal
+
+The journal is what turns single verdicts into a track record. After every run:
+
+1. **Append to `council-journal.json`** in the workspace (create if absent) — one entry per run:
+   ```json
+   { "ts": "<timestamp>", "question": "<one-line>", "type": "<decision type>",
+     "verdict": "<recommendation in ≤25 words>", "consensus": 72, "confidence": 85,
+     "dissent": 38, "report": "council-report-<ts>.html", "transcript": "council-transcript-<ts>.md",
+     "revisit": null }
+   ```
+2. **Regenerate `council-journal.html`** from `journal-template.html` (in this skill's base directory), filling its tokens from the JSON — newest first. Don't open it automatically; just mention it exists.
+
+Journal token reference: `{{J_TOTAL}}` run count · `{{J_AVG_CONF}}` mean confidence (whole number) · `{{J_REVISITED}}` count of revisited entries · `{{J_HITRATE}}` `N/M` of revisited entries scored `hit` (or `—` if none revisited) · `{{J_UPDATED}}` timestamp · `{{JOURNAL_ROWS}}` one `<a class="jrow glass" href="<report file>">` per entry, newest first, containing `<div class="jtop"><span class="jdate">date</span><span class="jtype">type</span>[<span class="badge hit|miss|mixed">verdict aged</span> or <span class="badge open">open</span>]</div><p class="jq">question</p><p class="jv">verdict</p><div class="jstats">Consensus <b>72</b> · Confidence <b>85</b> · Dissent <b>38</b></div>[<div class="jlesson"><b>Lesson:</b> …</div> when revisited]`.
+
+## revisiting a decision — `council revisit:`
+
+This is the council's accountability loop: score a past verdict against reality.
+
+1. Find the matching entry in `council-journal.json` (fuzzy-match the question; if ambiguous, list candidates and ask which — one question only).
+2. Ask the user: **"What actually happened, and how did it turn out?"**
+3. Spawn ONE sub-agent (chairman's model) with the original framed question, the full verdict from the transcript, and the user's account. It returns strictly: a score — `hit` (the recommendation was right), `miss` (wrong), or `mixed` — plus which advisor's position aged best, and one transferable lesson in ≤40 words. Score the *recommendation that was given*, not the user's execution of it.
+4. Write `revisit: { "score": "...", "closest_advisor": "...", "lesson": "...", "outcome": "<user's account, one line>", "ts": "<now>" }` into the entry, regenerate the journal HTML, and show the user the score + lesson inline.
+
+Over time the journal shows which lenses age best on YOUR decisions — that's the point. Never soften a `miss`; a council that can't admit misses is a horoscope.
+
 ## output format
 
-Every session produces two files:
+Every session produces or updates:
 
 ```
 council-report-[timestamp].html    # visual report for scanning
-council-transcript-[timestamp].md   # full transcript for reference
+council-transcript-[timestamp].md  # full transcript for reference
+council-journal.json               # machine-readable run history (appended)
+council-journal.html               # the decision journal dashboard (regenerated)
 ```
 
 ---
