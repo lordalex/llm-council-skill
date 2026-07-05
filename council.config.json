@@ -1,5 +1,5 @@
 {
-  "_comment": "Per-seat model for the LLM Council. Edit values freely. Valid: opus | sonnet | haiku | fable | default. Omit a key to use the built-in default. 'reviewers' sets all 5 peer reviewers. Precedence: inline message override > project ./council.config.json > this global file > built-in defaults.",
+  "_comment": "Per-seat model for the LLM Council. Edit values freely. Valid models: opus | sonnet | haiku | fable | default. Omit a key to use the built-in default. 'reviewers' sets all 5 peer reviewers. Precedence: inline message override > project ./council.config.json > this global file > built-in defaults. 'expert' seats the conditional Expert (auto | always | never). 'expert_research' (off | on) lets The Expert verify claims against external sources — off by default: research sends query text off your machine.",
   "models": {
     "contrarian": "opus",
     "first_principles": "opus",
@@ -7,6 +7,9 @@
     "executor": "sonnet",
     "domain_specialist": "opus",
     "reviewers": "sonnet",
-    "chairman": "opus"
-  }
+    "chairman": "opus",
+    "expert": "opus"
+  },
+  "expert": "auto",
+  "expert_research": "off"
 }

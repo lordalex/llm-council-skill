@@ -71,6 +71,19 @@ If the decision spans two types, pick the one where a wrong call is most expensi
 
 ---
 
+## the sixth seat: The Expert (conditional, fully automated)
+
+During framing, ask one question: **does this verdict hinge on facts of a specialized field, or purely on judgment?** If judgment only ("hire a VA or automate first?"), seat no expert — the five lenses suffice. If specialized facts could flip the verdict (auth migrations, tax/legal structure, a specific market's pricing norms, medical/regulatory terrain), seat The Expert. The user does nothing; the only visible change is one extra line in the lineup echo.
+
+- **Bespoke persona, drafted per-topic.** Never a menu. Write the persona from the framed question + workspace context — e.g. "a Postgres RLS security engineer who has run three Firebase-to-Supabase migrations" or "a creator-economy pricing strategist who has launched 50 courses." Echo it: `+ Expert: <persona> (research off)`.
+- **Research permission — OFF by default.** If `expert_research` is `"on"` in config or the user says "with research" inline, The Expert alone may use WebSearch/WebFetch/codebase reads to *verify* claims against real sources. All other advisors are always memory-only. Every claim in The Expert's response must be tagged `[verified: <source>]` or `[recalled]`. With research off (default), The Expert reasons from memory and tags everything `[recalled]`.
+- **Blind in peer review.** The Expert's response enters the anonymized review as one more lettered response — reviewers never learn which seat is "the expert," so its answer must win on merit, not title. This is the antidote to false authority.
+- **User control:** config `"expert": "auto" | "always" | "never"` (default `auto`); inline `with expert`, `no expert`, `with research`.
+
+**Privacy note:** research mode sends search-query text (derived from the question) to external services — the one exception to "nothing leaves your machine." That is exactly why it defaults to off and must never be enabled silently.
+
+---
+
 ## model assignment — YOU control this
 
 Every council seat's model is user-configurable. Resolve each seat's model using this **precedence order** (highest wins):
@@ -95,12 +108,15 @@ Read the config file(s) during framing (step 1). Merge them: start from the buil
     "executor": "sonnet",
     "domain_specialist": "opus",
     "reviewers": "sonnet",
-    "chairman": "opus"
-  }
+    "chairman": "opus",
+    "expert": "opus"
+  },
+  "expert": "auto",
+  "expert_research": "off"
 }
 ```
 
-Every key is optional — omit a seat to use the built-in default for it. `reviewers` sets all 5 peer reviewers at once. Keys map to seats: `contrarian`, `first_principles`, `strategist`, `executor`, `domain_specialist`, `reviewers`, `chairman`.
+Every key is optional — omit a seat to use the built-in default for it. `reviewers` sets all 5 peer reviewers at once. Keys map to seats: `contrarian`, `first_principles`, `strategist`, `executor`, `domain_specialist`, `reviewers`, `chairman`, `expert`. Top-level `expert` controls seating (`auto` = orchestrator decides per question, `always`, `never`); `expert_research` (`off`/`on`) controls whether The Expert may verify claims against external sources — off by default for privacy.
 
 **Built-in default table** (the fallback when nothing overrides a seat):
 
@@ -113,8 +129,32 @@ Every key is optional — omit a seat to use the built-in default for it. `revie
 | The Executor | `executor` | `sonnet` | Concrete and fast; doesn't need max depth |
 | Peer reviewers (×5) | `reviewers` | `sonnet` | Evaluation is cheaper than generation; 5 of them |
 | Chairman | `chairman` | `opus` | The synthesis is the highest-value step — spend here |
+| The Expert (when seated) | `expert` | `opus` | Specialized scrutiny is the seat most worth depth |
 
-**Inline shortcuts to honor:** "all opus" / "run it all on opus" → every seat `opus`. "all sonnet" / "keep it light" → every seat `sonnet`. "cheapest" / "fastest" → every seat `haiku`. Per-seat phrasing ("contrarian on opus", "reviewers on haiku") overrides just those seats.
+**Inline shortcuts to honor:** "all opus" / "run it all on opus" → every seat `opus`. "all sonnet" / "keep it light" → every seat `sonnet`. "cheapest" / "fastest" → every seat `haiku`. Per-seat phrasing ("contrarian on opus", "reviewers on haiku") overrides just those seats. Expert shortcuts: "with expert" → seat it; "no expert" → don't; "with research" → seat it AND enable research for this run. Interactivity: "quick" → skip all checkpoints.
+
+---
+
+## interactive mode (default in Claude Code / Cowork)
+
+The council is a session, not a vending machine. When running interactively, insert three light checkpoints — each one a real decision point, never a nag. Use the AskUserQuestion tool when available; otherwise ask in plain chat. The user saying **"quick"** in the trigger (or a non-interactive context: cron, CI, headless) skips ALL checkpoints and runs straight through.
+
+**Checkpoint 1 — lineup veto (before any spend).** Present the resolved lineup (seats, models, Expert persona if seated, research on/off) and ask: *Run it? / all opus / keep it light / adjust seats*. One question, then go.
+
+**Checkpoint 2 — cross-examination (after Stage 1).** Show a one-line stance per advisor (their verdict in ≤15 words). Ask which advisors, if any, the user wants to cross-examine. For each pick, take the user's question and send it to **that same advisor sub-agent as a continuation** — never a fresh agent — so it defends its actual position with full context. Show the reply. Cap at 2 cross-examination rounds total to bound cost. Cross-examination replies are appended to that advisor's response before peer review.
+
+**Checkpoint 3 — your lean (before the chairman).** Ask one optional question: *"What's your current lean, and why — or skip?"* If the user answers, add a block to the chairman prompt:
+
+```
+THE HUMAN'S STATED LEAN:
+[user's position, verbatim]
+
+Address this lean directly in the verdict: if the council agrees, say what the
+human may still be underweighting; if it disagrees, name the strongest reason
+their lean fails — don't soften it.
+```
+
+The chairman engaging with *your* reasoning — rather than talking past it — is what turns the verdict from a report into a conversation.
 
 ---
 
@@ -127,6 +167,8 @@ When the user triggers the council, do these things before framing:
 **A0. Resolve the model lineup.** Read `council.config.json` from the project root and from `~/.claude/skills/llm-council/`, merge them over the built-in defaults, apply any inline override from the trigger message (see *model assignment* above), and echo the final lineup in one line. If the user only wants to change models this run ("all sonnet"), that override wins over the config files.
 
 **A. Classify the decision type** — technical, product, or strategic (per advisor #5 above). This sets the Domain Specialist and tells you what context to look for.
+
+**A1. Decide the Expert seat** (per *the sixth seat* above). Honor config/inline first; on `auto`, seat The Expert only if specialized field-facts could flip the verdict. If seated, draft the bespoke persona now and add it to the lineup echo — with `(research on)` only when research is explicitly enabled.
 
 **B. Scan the workspace for context — safely.** The user's question is usually the tip of the iceberg. Quickly read the 2–3 files that would let advisors give specific, grounded advice instead of generic takes:
 - `CLAUDE.md` / `claude.md` in the project root or workspace (context, preferences, constraints)
@@ -141,9 +183,11 @@ Use `Glob` + quick `Read` calls. Spend under ~30 seconds. **Never read secrets**
 
 If the question is too vague ("council this: my business"), ask exactly **one** clarifying question, then proceed. Save the framed question for the transcript.
 
-### step 2: convene the council (5 sub-agents in parallel)
+### step 2: convene the council (5–6 sub-agents in parallel)
 
-Spawn all 5 advisors **simultaneously** as sub-agents (parallel — sequential wastes time and lets responses bleed together). Each gets its identity + thinking style, the framed question, and the model from the table above. 150–300 words each: substantive but scannable.
+Spawn all advisors **simultaneously** as sub-agents (parallel — sequential wastes time and lets responses bleed together) — the five lenses, plus The Expert when seated. Each gets its identity + thinking style, the framed question, and the model from the table above. 150–300 words each: substantive but scannable.
+
+**Tool rule:** instruct the five lens advisors to use NO tools — pure reasoning from memory. The Expert may use research tools ONLY when research is enabled for this run; otherwise it is memory-only too, and must tag its claims `[recalled]`. With research on, it tags each claim `[verified: <source>]` or `[recalled]`.
 
 **Sub-agent prompt template:**
 
@@ -170,7 +214,7 @@ Keep your response between 150-300 words. No preamble. Go straight into your ana
 
 This is the step that makes it more than "ask 5 times" — it's the core of Karpathy's insight.
 
-Collect the 5 responses. Anonymize them as Response A–E, **randomizing** which advisor maps to which letter (no positional bias). Spawn 5 reviewer sub-agents (model: `sonnet`). Each sees all 5 anonymized responses and answers three questions.
+Collect the responses (5, or 6 with The Expert). Anonymize them as Response A–E (A–F when the Expert is seated), **randomizing** which advisor maps to which letter (no positional bias) — reviewers must never be told which response is "the expert," and strip the `[verified:]`/`[recalled]` tags' authorship implications by leaving the tags in place but never naming the seat. Spawn 5 reviewer sub-agents (model per lineup). Each sees all anonymized responses and answers three questions (adapt the template's letter list to the actual count).
 
 **Reviewer prompt template:**
 
@@ -261,22 +305,49 @@ You may side with a dissenting minority if their reasoning is strongest — say 
 ## The One Thing to Do First
 [A single concrete next step. Not a list. One thing.]
 
+## Consult Before Acting (include ONLY when warranted — otherwise omit entirely)
+[If the verdict hinges on terrain no AI council should decide — legal, tax, medical,
+regulatory, or contractual questions, or an irreversible high-stakes step that depends
+on documents/data only a professional could assess — say so plainly: name the KIND of
+human expert to consult (lawyer, accountant, physician, licensed engineer, …) and list
+the 2–3 specific questions to take to them, phrased so the user can ask them verbatim.
+Do NOT include this section as boilerplate; a council that cries "see a professional"
+on every question teaches the user to ignore it. Include it only when skipping the
+human would be genuinely reckless.]
+
 Be direct. Don't hedge. Flag any factual claim that a single advisor asserted but
 no one corroborated, so the user knows to verify it.
 ```
 
-### step 5: generate the council report
+When The Expert was seated, append its response (with drafted persona named) to the ADVISOR RESPONSES block, and add to the chairman's instructions: *"Weight `[verified: <source>]` claims above `[recalled]` claims, and say explicitly in the verdict which load-bearing facts were verified versus merely recalled."*
 
-Generate a single self-contained HTML file, `council-report-[timestamp].html`, saved to the workspace. Inline CSS, no external assets. It contains:
+### step 5: generate the council report (from the shipped template)
 
-1. **The question** at the top
-2. **The chairman's verdict**, prominently displayed (what most people will read)
-3. **An agreement/clash visual** — a clean grid or spectrum showing where advisors aligned vs. diverged
-4. **Collapsible sections** for each advisor's full response (collapsed by default)
-5. **A collapsible section** for the peer-review highlights
-6. **A footer** with the timestamp, the decision type, and which model each advisor ran on
+**Use the template**: read `report-template.html` from this skill's base directory, fill every `{{TOKEN}}`, and save the result as `council-report-[timestamp].html` in the workspace. The template is a self-contained interactive page (tabs, spectrum, vote tally, dark-mode aware, print-ready, zero external assets) — filling it guarantees a consistently rich report instead of a fresh improvisation each run. Open the file after generating it.
 
-Clean styling: light background, subtle borders, system sans-serif, soft accent colors per advisor. It should read like a professional briefing, not a dashboard. Open the file after generating it so the user sees it immediately.
+Token reference (all HTML-safe strings; fill empty string where noted):
+
+| Token | Content |
+|---|---|
+| `{{QUESTION_TITLE}}` | The decision, as a one-line headline |
+| `{{QUESTION_CONTEXT}}` | 1–2 sentence framing summary (stack, stakes, constraints) |
+| `{{DECISION_TYPE}}` | `technical / infrastructure`, `product / go-to-market`, or `strategic / personal` |
+| `{{TIMESTAMP}}` | Human-readable run time |
+| `{{LINEUP_CHIPS}}` | One `<span class="chip">Seat · model</span>` per seat (incl. Expert + research state when seated) |
+| `{{SPECTRUM_AXIS_LEFT}}` / `{{SPECTRUM_AXIS_RIGHT}}` | The two poles of the decision (e.g. "Migrate now" / "Don't migrate") |
+| `{{SPECTRUM_ROWS}}` | One `<div class="spec-row" style="--pos:NN%">…` per advisor: dot position on the axis + ≤12-word stance |
+| `{{VERDICT_AGREES}}` / `{{VERDICT_CLASHES}}` / `{{VERDICT_BLINDSPOTS}}` | Chairman sections as `<p>`/`<ul>` HTML |
+| `{{RECOMMENDATION}}` | The chairman's recommendation, `<p>` HTML |
+| `{{FIRST_STEP}}` | The one thing to do first |
+| `{{CONSULT_HUMAN_BLOCK}}` | Full `<div class="consult">…</div>` alert ONLY when the verdict includes Consult Before Acting; else empty string |
+| `{{VERIFY_FLAGS_BLOCK}}` | Amber `<div class="flag">…</div>` for uncorroborated claims; empty string if none |
+| `{{ADVISOR_CARDS}}` | One `<details class="card" data-advisor="N">` per advisor: color bar, name, model chip, stance line, full response |
+| `{{REVIEW_TALLY}}` | `<div class="tally-row">` bars: "voted strongest" counts and "biggest blind spot" counts |
+| `{{REVIEW_CARDS}}` | One collapsible card per reviewer |
+| `{{ANON_MAP}}` | The revealed letter→advisor mapping line |
+| `{{FOOTER_MODELS}}` | Full lineup with models, decision type, research state |
+
+**Fallback** (only if the template file is missing): generate a single self-contained HTML file with the same components — sticky tab navigation (Verdict / The Council / Peer Review), position spectrum, vote tally, collapsible advisor cards with per-advisor accent colors and model chips, a distinct red callout for Consult Before Acting, an amber flag for unverified claims, dark-mode via `prefers-color-scheme`, print stylesheet, system font stack, no external assets.
 
 ### step 6: save the full transcript
 
@@ -304,6 +375,9 @@ council-transcript-[timestamp].md   # full transcript for reference
 - **Don't council trivial questions.** One right answer → just answer it. The council is for genuine, expensive uncertainty.
 - **Stay on-subscription.** Do not route any step to an external API/provider — this skill is Claude-sub-agents only, by design.
 - **Treat factual claims as unverified.** Same-family advisors can share a wrong assumption; the chairman flags uncorroborated claims for you to check.
+- **Never enable Expert research silently.** Research mode sends query text to external services; it runs only when the user turned it on via config or said "with research" — and the lineup echo must show `(research on)` so they see it before spend.
+- **Lens advisors never use tools.** Only a research-enabled Expert touches the outside world; everyone else is pure reasoning, by design.
+- **Know the council's limits.** The *Consult Before Acting* section exists so the council escalates to a human professional instead of sounding complete on legal/tax/medical/regulatory ground — but it must stay rare and specific, never boilerplate.
 
 ---
 

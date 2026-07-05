@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Council Verdict — {{QUESTION_TITLE}}</title>
+<style>
+:root{
+  --bg:#f6f6f4; --card:#ffffff; --ink:#191a1e; --muted:#6b7080; --line:#e4e4e2;
+  --accent:#4f46e5; --accent-soft:#eef0ff; --agree:#15803d; --clash:#c2410c; --blind:#7c3aed;
+  --alert-bg:#fef2f2; --alert-line:#fecaca; --alert-ink:#991b1b;
+  --flag-bg:#fffbeb; --flag-line:#fde68a; --flag-ink:#92400e;
+  --a1:#dc2626; --a2:#2563eb; --a3:#d97706; --a4:#059669; --a5:#7c3aed; --a6:#0891b2;
+  --radius:14px; --shadow:0 1px 3px rgba(20,20,30,.06),0 8px 24px -12px rgba(20,20,30,.10);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101116; --card:#1a1c23; --ink:#e8e8ea; --muted:#9aa0ae; --line:#2a2d37;
+    --accent:#818cf8; --accent-soft:#23264a; --agree:#4ade80; --clash:#fb923c; --blind:#c4b5fd;
+    --alert-bg:#2a1516; --alert-line:#7f1d1d; --alert-ink:#fca5a5;
+    --flag-bg:#271e0d; --flag-line:#713f12; --flag-ink:#fcd34d;
+    --shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px -12px rgba(0,0,0,.5);
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 90px}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(135deg,#312e81 0%,#4f46e5 55%,#6d28d9 100%);
+  color:#fff;border-radius:0 0 28px 28px;padding:44px 0 84px;margin:0 -24px 0;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(900px 300px at 85% -10%,rgba(255,255,255,.16),transparent 60%)}
+.hero-inner{max-width:900px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.eyebrow{display:flex;gap:10px;align-items:center;font-size:12px;letter-spacing:.16em;
+  text-transform:uppercase;font-weight:700;opacity:.9}
+.eyebrow .seal{width:26px;height:26px;border:2px solid rgba(255,255,255,.7);border-radius:50%;
+  display:grid;place-items:center;font-size:13px}
+h1{font-size:clamp(22px,3.4vw,30px);line-height:1.28;margin:14px 0 10px;font-weight:800;letter-spacing:-.01em}
+.hero .sub{font-size:15px;opacity:.88;max-width:64ch}
+.meta-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:100px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);color:#fff;white-space:nowrap}
+.chip.hot{background:rgba(255,255,255,.92);color:#312e81}
+
+/* ---------- tab bar ---------- */
+.tabbar{position:sticky;top:0;z-index:50;display:flex;gap:6px;max-width:900px;margin:-40px auto 26px;
+  padding:6px;background:var(--card);border:1px solid var(--line);border-radius:100px;box-shadow:var(--shadow)}
+.tab{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13.5px;font-weight:700;
+  padding:10px 6px;border-radius:100px;cursor:pointer;transition:all .18s;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab.active{background:var(--accent);color:#fff}
+.tab .kbd{font-size:10px;opacity:.55;font-weight:600;margin-left:5px}
+.panel{display:none;animation:fade .25s ease}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- shared ---------- */
+h2{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  font-weight:800;margin:30px 0 12px}
+.card-box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:20px 24px;margin-bottom:14px}
+.toolbar{display:flex;gap:8px;justify-content:flex-end;margin:4px 0 10px}
+.btn{font:inherit;font-size:12px;font-weight:700;color:var(--muted);background:var(--card);
+  border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+.btn:hover{color:var(--ink);border-color:var(--muted)}
+
+/* ---------- verdict ---------- */
+.v-section{display:grid;grid-template-columns:26px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+.v-section:last-child{border-bottom:0}
+.v-ico{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px;margin-top:2px}
+.v-ico.agree{background:color-mix(in srgb,var(--agree) 15%,transparent);color:var(--agree)}
+.v-ico.clash{background:color-mix(in srgb,var(--clash) 15%,transparent);color:var(--clash)}
+.v-ico.blind{background:color-mix(in srgb,var(--blind) 15%,transparent);color:var(--blind)}
+.v-section h3{margin:0 0 6px;font-size:15.5px}
+.v-section p,.v-section ul{margin:6px 0;font-size:14.5px;color:color-mix(in srgb,var(--ink) 88%,var(--muted))}
+.rec{background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+  border-radius:var(--radius);padding:20px 24px;margin:18px 0 0}
+.rec .k{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--accent)}
+.rec p{margin:8px 0 0;font-size:15px}
+.first{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;background:var(--card);
+  border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);
+  padding:18px 22px;margin-top:14px;box-shadow:var(--shadow)}
+.first .num{font-size:26px;font-weight:800;color:var(--accent);line-height:1}
+.first .k{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.first p{margin:4px 0 0;font-size:14.5px}
+.consult{background:var(--alert-bg);border:1px solid var(--alert-line);border-radius:var(--radius);
+  padding:18px 22px;margin-top:14px;color:var(--alert-ink)}
+.consult .k{font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.consult p,.consult ul{font-size:14px;margin:8px 0 0}
+.flag{background:var(--flag-bg);border:1px solid var(--flag-line);border-radius:var(--radius);
+  padding:14px 20px;margin-top:14px;color:var(--flag-ink);font-size:13.5px}
+
+/* ---------- spectrum ---------- */
+.spectrum{padding:6px 0 2px}
+.axis{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.spec-row{display:grid;grid-template-columns:130px 1fr;gap:14px;align-items:center;padding:7px 0}
+.spec-row .who{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.spec-row .who i{width:9px;height:9px;border-radius:50%;flex:none}
+.spec-track{position:relative;height:26px;background:linear-gradient(90deg,
+  color-mix(in srgb,var(--accent) 12%,transparent),color-mix(in srgb,var(--clash) 12%,transparent));
+  border-radius:100px;border:1px solid var(--line)}
+.spec-dot{position:absolute;top:50%;left:var(--pos);transform:translate(-50%,-50%);
+  min-width:14px;height:14px;border-radius:100px;border:2.5px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.spec-label{position:absolute;top:50%;left:var(--pos);transform:translate(-50%,-50%);
+  font-size:10.5px;font-weight:700;color:#fff;padding:2px 9px;border-radius:100px;white-space:nowrap;
+  border:2px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.c1{background:var(--a1)}.c2{background:var(--a2)}.c3{background:var(--a3)}
+.c4{background:var(--a4)}.c5{background:var(--a5)}.c6{background:var(--a6)}
+
+/* ---------- advisor cards ---------- */
+details.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  margin:10px 0;box-shadow:var(--shadow);overflow:hidden}
+details.card summary{list-style:none;cursor:pointer;display:grid;
+  grid-template-columns:5px auto 1fr auto auto;gap:14px;align-items:center;padding:15px 18px}
+details.card summary::-webkit-details-marker{display:none}
+.cbar{width:5px;height:38px;border-radius:4px}
+.cname{font-weight:800;font-size:14.5px;white-space:nowrap}
+.cname small{display:block;font-weight:600;font-size:11px;color:var(--muted)}
+.cstance{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.model-chip{font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);
+  border:1px solid var(--line);border-radius:6px;padding:2px 8px;text-transform:uppercase}
+.chev{color:var(--muted);transition:transform .2s;font-size:13px}
+details[open] .chev{transform:rotate(90deg)}
+.cbody{padding:4px 22px 18px 37px;font-size:14px;color:color-mix(in srgb,var(--ink) 88%,var(--muted))}
+.cbody p{margin:10px 0}
+.xexam{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px;font-size:13px}
+.xexam .k{font-weight:800;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+mark.verified{background:color-mix(in srgb,var(--agree) 18%,transparent);color:inherit;border-radius:4px;padding:0 3px}
+mark.recalled{background:color-mix(in srgb,var(--flag-ink) 15%,transparent);color:inherit;border-radius:4px;padding:0 3px}
+
+/* ---------- peer review ---------- */
+.tally-row{display:grid;grid-template-columns:170px 1fr 34px;gap:12px;align-items:center;padding:6px 0;font-size:13px}
+.tally-row .who{font-weight:700;display:flex;align-items:center;gap:8px}
+.tally-row .who i{width:9px;height:9px;border-radius:50%;flex:none}
+.tally-bar{height:12px;border-radius:100px;background:var(--line);overflow:hidden}
+.tally-fill{height:100%;border-radius:100px;width:var(--w);transition:width .6s ease}
+.tally-n{font-weight:800;text-align:right;color:var(--muted)}
+.anon{font-size:12.5px;color:var(--muted);background:var(--card);border:1px dashed var(--line);
+  border-radius:10px;padding:10px 16px;margin-top:14px}
+
+/* ---------- footer ---------- */
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);line-height:1.8}
+footer code{background:color-mix(in srgb,var(--muted) 14%,transparent);padding:1px 6px;border-radius:5px}
+
+/* ---------- print ---------- */
+@media print{
+  .tabbar,.toolbar{display:none}
+  .panel{display:block!important;page-break-inside:avoid}
+  details.card{page-break-inside:avoid}
+  details.card:not([open]) .cbody{display:block}
+  .hero{border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff}
+}
+@media (max-width:640px){
+  .spec-row{grid-template-columns:96px 1fr}
+  .tally-row{grid-template-columns:120px 1fr 30px}
+  .tab .kbd{display:none}
+  .cstance{display:none}
+}
+</style>
+</head>
+<body>
+<div class="hero"><div class="hero-inner">
+  <div class="eyebrow"><span class="seal">⚖</span> LLM COUNCIL · VERDICT</div>
+  <h1>{{QUESTION_TITLE}}</h1>
+  <div class="sub">{{QUESTION_CONTEXT}}</div>
+  <div class="meta-chips">
+    <span class="chip hot">{{DECISION_TYPE}}</span>
+    {{LINEUP_CHIPS}}
+  </div>
+</div></div>
+
+<div class="wrap">
+  <nav class="tabbar" role="tablist">
+    <button class="tab active" data-panel="verdict" role="tab">Verdict <span class="kbd">1</span></button>
+    <button class="tab" data-panel="council" role="tab">The Council <span class="kbd">2</span></button>
+    <button class="tab" data-panel="review" role="tab">Peer Review <span class="kbd">3</span></button>
+  </nav>
+
+  <!-- ================= VERDICT ================= -->
+  <section class="panel active" id="verdict">
+    <div class="toolbar"><button class="btn" id="copyVerdict">Copy verdict</button>
+      <button class="btn" onclick="window.print()">Print / PDF</button></div>
+
+    <div class="card-box" id="verdictBody">
+      <div class="v-section"><div class="v-ico agree">✓</div><div>
+        <h3>Where the council agrees</h3>{{VERDICT_AGREES}}</div></div>
+      <div class="v-section"><div class="v-ico clash">⚡</div><div>
+        <h3>Where the council clashes</h3>{{VERDICT_CLASHES}}</div></div>
+      <div class="v-section"><div class="v-ico blind">◎</div><div>
+        <h3>Blind spots the peer review caught</h3>{{VERDICT_BLINDSPOTS}}</div></div>
+    </div>
+
+    <div class="rec"><span class="k">The recommendation</span>{{RECOMMENDATION}}</div>
+
+    <div class="first"><div class="num">1</div><div>
+      <span class="k">The one thing to do first</span>
+      <p>{{FIRST_STEP}}</p></div></div>
+
+    {{CONSULT_HUMAN_BLOCK}}
+    {{VERIFY_FLAGS_BLOCK}}
+  </section>
+
+  <!-- ================= COUNCIL ================= -->
+  <section class="panel" id="council">
+    <h2>Where each advisor landed</h2>
+    <div class="card-box spectrum">
+      <div class="axis"><span>{{SPECTRUM_AXIS_LEFT}}</span><span>{{SPECTRUM_AXIS_RIGHT}}</span></div>
+      {{SPECTRUM_ROWS}}
+    </div>
+
+    <h2>Full responses</h2>
+    <div class="toolbar">
+      <button class="btn" onclick="toggleAll('council',true)">Expand all</button>
+      <button class="btn" onclick="toggleAll('council',false)">Collapse all</button>
+    </div>
+    {{ADVISOR_CARDS}}
+  </section>
+
+  <!-- ================= PEER REVIEW ================= -->
+  <section class="panel" id="review">
+    <h2>How the blind review voted</h2>
+    <div class="card-box">{{REVIEW_TALLY}}</div>
+
+    <h2>Reviewer notes</h2>
+    <div class="toolbar">
+      <button class="btn" onclick="toggleAll('review',true)">Expand all</button>
+      <button class="btn" onclick="toggleAll('review',false)">Collapse all</button>
+    </div>
+    {{REVIEW_CARDS}}
+    <div class="anon">🎭 Anonymization revealed: {{ANON_MAP}}</div>
+  </section>
+
+  <footer>
+    Generated {{TIMESTAMP}} · {{FOOTER_MODELS}}<br>
+    LLM Council v2 — runs on your Claude subscription · full transcript in the matching <code>council-transcript-*.md</code>
+  </footer>
+</div>
+
+<script>
+const tabs=[...document.querySelectorAll('.tab')];
+function show(id){
+  tabs.forEach(t=>t.classList.toggle('active',t.dataset.panel===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.panel)));
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  const map={'1':'verdict','2':'council','3':'review'};
+  if(map[e.key])show(map[e.key]);
+});
+function toggleAll(panelId,open){
+  document.querySelectorAll('#'+panelId+' details').forEach(d=>d.open=open);
+}
+document.getElementById('copyVerdict').addEventListener('click',async e=>{
+  const txt=document.getElementById('verdictBody').innerText+'\n\nRECOMMENDATION\n'+
+    document.querySelector('.rec').innerText+'\n\nFIRST STEP\n'+document.querySelector('.first').innerText;
+  try{await navigator.clipboard.writeText(txt);e.target.textContent='Copied ✓';
+    setTimeout(()=>e.target.textContent='Copy verdict',1600);}catch(_){}
+});
+</script>
+</body>
+</html>
