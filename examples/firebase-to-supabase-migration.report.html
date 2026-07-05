@@ -6,291 +6,388 @@
 <title>Council Verdict — Migrate the backend from Firebase to Supabase — now, later, or not at all?</title>
 <style>
 :root{
-  --bg:#f6f6f4; --card:#ffffff; --ink:#191a1e; --muted:#6b7080; --line:#e4e4e2;
-  --accent:#4f46e5; --accent-soft:#eef0ff; --agree:#15803d; --clash:#c2410c; --blind:#7c3aed;
-  --alert-bg:#fef2f2; --alert-line:#fecaca; --alert-ink:#991b1b;
-  --flag-bg:#fffbeb; --flag-line:#fde68a; --flag-ink:#92400e;
-  --a1:#dc2626; --a2:#2563eb; --a3:#d97706; --a4:#059669; --a5:#7c3aed; --a6:#0891b2;
-  --radius:14px; --shadow:0 1px 3px rgba(20,20,30,.06),0 8px 24px -12px rgba(20,20,30,.10);
+  --paper:#faf8f2; --ink:#1d1b16; --muted:#7d7668; --faint:#a9a294;
+  --rule:#e5dfd2; --rule-strong:#c9c2b2; --accent:#8a2f26; --accent-soft:#f3e6e2;
+  --wash:#f2efe6;
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --bg:#101116; --card:#1a1c23; --ink:#e8e8ea; --muted:#9aa0ae; --line:#2a2d37;
-    --accent:#818cf8; --accent-soft:#23264a; --agree:#4ade80; --clash:#fb923c; --blind:#c4b5fd;
-    --alert-bg:#2a1516; --alert-line:#7f1d1d; --alert-ink:#fca5a5;
-    --flag-bg:#271e0d; --flag-line:#713f12; --flag-ink:#fcd34d;
-    --shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px -12px rgba(0,0,0,.5);
+    --paper:#161511; --ink:#e8e3d7; --muted:#98917f; --faint:#6b6557;
+    --rule:#2b2921; --rule-strong:#413d31; --accent:#d07a63; --accent-soft:#2c1d18;
+    --wash:#1d1b16;
   }
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:900px;margin:0 auto;padding:0 24px 90px}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:ui-serif,"New York","Iowan Old Style",Georgia,"Times New Roman",serif;
+  font-size:15.5px;line-height:1.68;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(1200px 500px at 50% -220px,rgba(0,0,0,.028),transparent 70%)}
+.mono{font-family:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace}
+.wrap{max-width:720px;margin:0 auto;padding:0 26px 110px}
+svg.gicon{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round;vertical-align:-.12em;flex:none}
 
-/* ---------- hero ---------- */
-.hero{background:linear-gradient(135deg,#312e81 0%,#4f46e5 55%,#6d28d9 100%);
-  color:#fff;border-radius:0 0 28px 28px;padding:44px 0 84px;margin:0 -24px 0;position:relative;overflow:hidden}
-.hero::after{content:"";position:absolute;inset:0;
-  background:radial-gradient(900px 300px at 85% -10%,rgba(255,255,255,.16),transparent 60%)}
-.hero-inner{max-width:900px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
-.eyebrow{display:flex;gap:10px;align-items:center;font-size:12px;letter-spacing:.16em;
-  text-transform:uppercase;font-weight:700;opacity:.9}
-.eyebrow .seal{width:26px;height:26px;border:2px solid rgba(255,255,255,.7);border-radius:50%;
-  display:grid;place-items:center;font-size:13px}
-h1{font-size:clamp(22px,3.4vw,30px);line-height:1.28;margin:14px 0 10px;font-weight:800;letter-spacing:-.01em}
-.hero .sub{font-size:15px;opacity:.88;max-width:64ch}
-.meta-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
-.chip{font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:100px;
-  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);color:#fff;white-space:nowrap}
-.chip.hot{background:rgba(255,255,255,.92);color:#312e81}
+/* ---------- masthead ---------- */
+.masthead{padding-top:54px;animation:rise .7s .05s both}
+.mast-top{display:flex;justify-content:space-between;align-items:baseline;
+  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.mast-top .seal{display:inline-flex;align-items:center;gap:9px;color:var(--ink)}
+.mast-top .seal svg{width:17px;height:17px;color:var(--accent)}
+.mast-rule{border:0;border-top:2.5px solid var(--ink);margin:14px 0 0;position:relative}
+.mast-rule::after{content:"";display:block;border-top:1px solid var(--ink);margin-top:3px}
+h1{font-size:clamp(27px,4.6vw,38px);line-height:1.16;font-weight:600;
+  letter-spacing:-.015em;margin:30px 0 14px;text-wrap:balance}
+.dek{font-size:16px;font-style:italic;color:var(--muted);max-width:58ch;margin:0}
+.metaline{display:flex;flex-wrap:wrap;gap:6px 0;align-items:center;margin:26px 0 0;
+  padding:12px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.metaline .chip{white-space:nowrap}
+.metaline .chip+.chip::before{content:"·";margin:0 9px;color:var(--faint)}
+.metaline .chip.hot{color:var(--accent);font-weight:700}
 
-/* ---------- tab bar ---------- */
-.tabbar{position:sticky;top:0;z-index:50;display:flex;gap:6px;max-width:900px;margin:-40px auto 26px;
-  padding:6px;background:var(--card);border:1px solid var(--line);border-radius:100px;box-shadow:var(--shadow)}
-.tab{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13.5px;font-weight:700;
-  padding:10px 6px;border-radius:100px;cursor:pointer;transition:all .18s;white-space:nowrap}
+/* ---------- nav ---------- */
+.tabbar{position:sticky;top:0;z-index:40;display:flex;gap:34px;margin:0 0 44px;
+  padding:16px 0 0;background:var(--paper);border-bottom:1px solid var(--rule)}
+.tab{appearance:none;border:0;background:none;cursor:pointer;padding:0 2px 13px;
+  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--muted);position:relative;transition:color .2s}
 .tab:hover{color:var(--ink)}
-.tab.active{background:var(--accent);color:#fff}
-.tab .kbd{font-size:10px;opacity:.55;font-weight:600;margin-left:5px}
-.panel{display:none;animation:fade .25s ease}
-.panel.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.tab::after{content:"";position:absolute;left:0;right:100%;bottom:-1px;
+  border-bottom:2px solid var(--accent);transition:right .28s cubic-bezier(.7,0,.3,1)}
+.tab.active{color:var(--ink)}
+.tab.active::after{right:0}
+.tab .kbd{opacity:.45;margin-left:6px}
+.panel{display:none}
+.panel.active{display:block;animation:rise .5s both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
 /* ---------- shared ---------- */
-h2{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
-  font-weight:800;margin:30px 0 12px}
-.card-box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-  box-shadow:var(--shadow);padding:20px 24px;margin-bottom:14px}
-.toolbar{display:flex;gap:8px;justify-content:flex-end;margin:4px 0 10px}
-.btn{font:inherit;font-size:12px;font-weight:700;color:var(--muted);background:var(--card);
-  border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
-.btn:hover{color:var(--ink);border-color:var(--muted)}
+.sec{margin:0 0 40px;animation:rise .6s both}
+.sec:nth-of-type(2){animation-delay:.06s}.sec:nth-of-type(3){animation-delay:.12s}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin:0 0 14px}
+.sec-no{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+  color:var(--accent);letter-spacing:.08em}
+.sec-head h2{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0;
+  display:flex;align-items:center;gap:9px}
+.sec-head h2 svg{width:15px;height:15px;color:var(--ink)}
+.sec-head .fill{flex:1;border-bottom:1px solid var(--rule)}
+.sec p,.sec ul{margin:10px 0;color:color-mix(in srgb,var(--ink) 92%,var(--muted))}
+.sec ul{padding-left:1.15em}
+.sec li{margin:7px 0}
+.toolbar{display:flex;gap:22px;justify-content:flex-end;margin:0 0 26px}
+.btn{appearance:none;border:0;background:none;cursor:pointer;padding:0;
+  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);border-bottom:1px solid transparent}
+.btn:hover{color:var(--ink);border-bottom-color:var(--rule-strong)}
 
-/* ---------- verdict ---------- */
-.v-section{display:grid;grid-template-columns:26px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
-.v-section:last-child{border-bottom:0}
-.v-ico{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px;margin-top:2px}
-.v-ico.agree{background:color-mix(in srgb,var(--agree) 15%,transparent);color:var(--agree)}
-.v-ico.clash{background:color-mix(in srgb,var(--clash) 15%,transparent);color:var(--clash)}
-.v-ico.blind{background:color-mix(in srgb,var(--blind) 15%,transparent);color:var(--blind)}
-.v-section h3{margin:0 0 6px;font-size:15.5px}
-.v-section p,.v-section ul{margin:6px 0;font-size:14.5px;color:color-mix(in srgb,var(--ink) 88%,var(--muted))}
-.rec{background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
-  border-radius:var(--radius);padding:20px 24px;margin:18px 0 0}
-.rec .k{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--accent)}
-.rec p{margin:8px 0 0;font-size:15px}
-.first{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;background:var(--card);
-  border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);
-  padding:18px 22px;margin-top:14px;box-shadow:var(--shadow)}
-.first .num{font-size:26px;font-weight:800;color:var(--accent);line-height:1}
-.first .k{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--muted)}
-.first p{margin:4px 0 0;font-size:14.5px}
-.consult{background:var(--alert-bg);border:1px solid var(--alert-line);border-radius:var(--radius);
-  padding:18px 22px;margin-top:14px;color:var(--alert-ink)}
-.consult .k{font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
-.consult p,.consult ul{font-size:14px;margin:8px 0 0}
-.flag{background:var(--flag-bg);border:1px solid var(--flag-line);border-radius:var(--radius);
-  padding:14px 20px;margin-top:14px;color:var(--flag-ink);font-size:13.5px}
+/* ---------- verdict blocks ---------- */
+.rec{border-top:2px solid var(--ink);border-bottom:1px solid var(--rule);
+  padding:22px 0 24px;margin:46px 0 0}
+.rec .k{display:flex;align-items:center;gap:9px;font-family:ui-monospace,"SF Mono",Menlo,monospace;
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.rec .k svg{width:15px;height:15px}
+.rec p{font-size:17px;line-height:1.62;margin:14px 0 0}
+.first{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:baseline;
+  padding:24px 0;border-bottom:1px solid var(--rule)}
+.first .num{font-size:46px;font-weight:600;line-height:.9;color:var(--accent);
+  font-variant-numeric:lining-nums}
+.first .k{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10.5px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.first p{margin:7px 0 0;font-size:15.5px}
+.consult{margin:26px 0 0;padding:20px 22px;background:var(--accent-soft);
+  border-left:2px solid var(--accent)}
+.consult .k{display:flex;align-items:center;gap:9px;font-family:ui-monospace,"SF Mono",Menlo,monospace;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.consult .k svg{width:15px;height:15px}
+.consult p,.consult ul{font-size:14.5px;margin:10px 0 0}
+.flagnote{display:grid;grid-template-columns:auto 1fr;gap:12px;margin:26px 0 0;
+  padding:16px 0 0;border-top:1px dashed var(--rule-strong);
+  font-size:13.5px;color:var(--muted);font-style:italic}
+.flagnote svg{width:16px;height:16px;margin-top:3px;color:var(--muted)}
 
 /* ---------- spectrum ---------- */
-.spectrum{padding:6px 0 2px}
-.axis{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
-.spec-row{display:grid;grid-template-columns:130px 1fr;gap:14px;align-items:center;padding:7px 0}
-.spec-row .who{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
-.spec-row .who i{width:9px;height:9px;border-radius:50%;flex:none}
-.spec-track{position:relative;height:26px;background:linear-gradient(90deg,
-  color-mix(in srgb,var(--accent) 12%,transparent),color-mix(in srgb,var(--clash) 12%,transparent));
-  border-radius:100px;border:1px solid var(--line)}
-.spec-dot{position:absolute;top:50%;left:var(--pos);transform:translate(-50%,-50%);
-  min-width:14px;height:14px;border-radius:100px;border:2.5px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,.25)}
-.spec-label{position:absolute;top:50%;left:var(--pos);transform:translate(-50%,-50%);
-  font-size:10.5px;font-weight:700;color:#fff;padding:2px 9px;border-radius:100px;white-space:nowrap;
-  border:2px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,.25)}
-.c1{background:var(--a1)}.c2{background:var(--a2)}.c3{background:var(--a3)}
-.c4{background:var(--a4)}.c5{background:var(--a5)}.c6{background:var(--a6)}
+.spectrum{padding:8px 0 6px}
+.axis{display:flex;justify-content:space-between;font-family:ui-monospace,"SF Mono",Menlo,monospace;
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:16px}
+.spec-row{display:grid;grid-template-columns:148px 1fr;gap:18px;align-items:center;padding:11px 0;
+  border-bottom:1px solid var(--rule)}
+.spec-row:last-child{border-bottom:0}
+.spec-row .who{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:9px}
+.spec-row .who svg{width:14px;height:14px;color:var(--ink)}
+.spec-track{position:relative;height:22px;border-bottom:1px solid var(--rule-strong)}
+.spec-track::before,.spec-track::after{content:"";position:absolute;bottom:-3.5px;width:1px;height:7px;
+  background:var(--rule-strong)}
+.spec-track::before{left:0}.spec-track::after{right:0}
+.spec-label{position:absolute;left:var(--pos);bottom:5px;transform:translateX(-50%);
+  font-size:12px;font-style:italic;color:var(--ink);white-space:nowrap;padding-bottom:8px}
+.spec-label::after{content:"";position:absolute;left:50%;bottom:-9px;width:8px;height:8px;
+  background:var(--accent);transform:translateX(-50%) rotate(45deg);
+  outline:3px solid var(--paper)}
+@media (max-width:620px){.spec-row{grid-template-columns:104px 1fr}.spec-label{font-size:10.5px}}
 
-/* ---------- advisor cards ---------- */
-details.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-  margin:10px 0;box-shadow:var(--shadow);overflow:hidden}
+/* ---------- advisor entries ---------- */
+details.card{border-bottom:1px solid var(--rule)}
+details.card:first-of-type{border-top:1px solid var(--rule)}
 details.card summary{list-style:none;cursor:pointer;display:grid;
-  grid-template-columns:5px auto 1fr auto auto;gap:14px;align-items:center;padding:15px 18px}
+  grid-template-columns:auto auto 1fr auto auto;gap:14px;align-items:baseline;padding:17px 2px}
 details.card summary::-webkit-details-marker{display:none}
-.cbar{width:5px;height:38px;border-radius:4px}
-.cname{font-weight:800;font-size:14.5px;white-space:nowrap}
-.cname small{display:block;font-weight:600;font-size:11px;color:var(--muted)}
-.cstance{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;
+details.card summary:hover .cname{color:var(--accent)}
+.cico{align-self:center;display:grid;place-items:center;width:30px;height:30px;
+  border:1px solid var(--rule-strong);border-radius:50%;color:var(--ink)}
+.cico svg{width:14px;height:14px}
+.cname{font-size:16px;font-weight:600;white-space:nowrap;transition:color .2s}
+.cname small{display:block;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:9.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:400;margin-top:2px}
+.cstance{font-size:13px;font-style:italic;color:var(--muted);overflow:hidden;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.model-chip{font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);
-  border:1px solid var(--line);border-radius:6px;padding:2px 8px;text-transform:uppercase}
-.chev{color:var(--muted);transition:transform .2s;font-size:13px}
+.model-chip{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:9.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.chev{align-self:center;color:var(--faint);transition:transform .25s}
+.chev svg{width:13px;height:13px}
 details[open] .chev{transform:rotate(90deg)}
-.cbody{padding:4px 22px 18px 37px;font-size:14px;color:color-mix(in srgb,var(--ink) 88%,var(--muted))}
+.cbody{padding:2px 2px 22px 44px;font-size:14.5px;color:color-mix(in srgb,var(--ink) 90%,var(--muted))}
 .cbody p{margin:10px 0}
-.xexam{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px;font-size:13px}
-.xexam .k{font-weight:800;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
-mark.verified{background:color-mix(in srgb,var(--agree) 18%,transparent);color:inherit;border-radius:4px;padding:0 3px}
-mark.recalled{background:color-mix(in srgb,var(--flag-ink) 15%,transparent);color:inherit;border-radius:4px;padding:0 3px}
+.xexam{margin-top:14px;padding:12px 0 0;border-top:1px dashed var(--rule-strong);font-size:13.5px}
+.xexam .k{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+mark.verified,mark.recalled{background:none;color:inherit;font-style:italic;
+  border-bottom:1px dotted var(--accent)}
+mark.recalled{border-bottom-color:var(--faint)}
+sup.tag{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:8.5px;
+  letter-spacing:.06em;color:var(--accent);text-transform:uppercase}
+sup.tag.rec{color:var(--faint)}
 
-/* ---------- peer review ---------- */
-.tally-row{display:grid;grid-template-columns:170px 1fr 34px;gap:12px;align-items:center;padding:6px 0;font-size:13px}
-.tally-row .who{font-weight:700;display:flex;align-items:center;gap:8px}
-.tally-row .who i{width:9px;height:9px;border-radius:50%;flex:none}
-.tally-bar{height:12px;border-radius:100px;background:var(--line);overflow:hidden}
-.tally-fill{height:100%;border-radius:100px;width:var(--w);transition:width .6s ease}
-.tally-n{font-weight:800;text-align:right;color:var(--muted)}
-.anon{font-size:12.5px;color:var(--muted);background:var(--card);border:1px dashed var(--line);
-  border-radius:10px;padding:10px 16px;margin-top:14px}
+/* ---------- tally ---------- */
+.tally-head{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin:20px 0 8px}
+.tally-head:first-child{margin-top:2px}
+.tally-row{display:grid;grid-template-columns:172px 1fr auto;gap:16px;align-items:center;
+  padding:8px 0;border-bottom:1px solid var(--rule);font-size:14px}
+.tally-row .who{display:flex;align-items:center;gap:9px;font-weight:600}
+.tally-row .who svg{width:14px;height:14px}
+.dots{display:flex;gap:7px}
+.dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--rule-strong)}
+.dot.on{background:var(--accent);border-color:var(--accent)}
+.tally-n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;color:var(--muted)}
+.anon{margin-top:26px;padding-top:14px;border-top:1px dashed var(--rule-strong);
+  font-size:13px;font-style:italic;color:var(--muted)}
+.anon .k{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-style:normal;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-right:8px}
 
 /* ---------- footer ---------- */
-footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);
-  font-size:12px;color:var(--muted);line-height:1.8}
-footer code{background:color-mix(in srgb,var(--muted) 14%,transparent);padding:1px 6px;border-radius:5px}
+.colophon{margin-top:70px}
+.colophon .rule{border:0;border-top:1px solid var(--ink);margin:0 0 3px}
+.colophon .rule2{border:0;border-top:2.5px solid var(--ink);margin:0 0 16px}
+.colophon p{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);line-height:2;margin:0}
+.colophon b{color:var(--ink);font-weight:600}
 
 /* ---------- print ---------- */
 @media print{
   .tabbar,.toolbar{display:none}
-  .panel{display:block!important;page-break-inside:avoid}
+  .panel{display:block!important}
   details.card{page-break-inside:avoid}
   details.card:not([open]) .cbody{display:block}
-  .hero{border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  body{background:#fff}
-}
-@media (max-width:640px){
-  .spec-row{grid-template-columns:96px 1fr}
-  .tally-row{grid-template-columns:120px 1fr 30px}
-  .tab .kbd{display:none}
-  .cstance{display:none}
+  body{background:#fff;font-size:12.5px}
+  .sec,.panel,.masthead{animation:none}
 }
 </style>
 </head>
 <body>
-<div class="hero"><div class="hero-inner">
-  <div class="eyebrow"><span class="seal">⚖</span> LLM COUNCIL · VERDICT</div>
-  <h1>Migrate the backend from Firebase to Supabase — now, later, or not at all?</h1>
-  <div class="sub">A small SaaS (Firestore + Firebase Auth + Cloud Functions; ~5k users, growing; two full-stack devs, no ops team) weighing a move to Supabase (Postgres + RLS + Edge Functions) for relational queries and predictable cost.</div>
-  <div class="meta-chips">
-    <span class="chip hot">technical / infrastructure</span>
-    <span class="chip">Contrarian · sonnet</span><span class="chip">First-Principles · sonnet</span><span class="chip">Strategist · sonnet</span><span class="chip">Executor · sonnet</span><span class="chip">Domain Specialist · sonnet</span><span class="chip">Reviewers ×5 · sonnet</span><span class="chip">Chairman · sonnet</span>
-  </div>
-</div></div>
+<!-- ============ icon sprite ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-seal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M7.2 9.2l9.6 5.6M16.8 9.2 7.2 14.8"/></symbol>
+    <symbol id="i-agree" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.4 2.5 2.6 4.9-5.8"/></symbol>
+    <symbol id="i-clash" viewBox="0 0 24 24"><path d="M4 8h10.5M14.5 8 11.3 4.8M14.5 8l-3.2 3.2"/><path d="M20 16H9.5M9.5 16l3.2-3.2M9.5 16l3.2 3.2"/></symbol>
+    <symbol id="i-blind" viewBox="0 0 24 24"><path d="m4 4 16 16"/><path d="M9 5.6A10 10 0 0 1 12 5.2c5.4 0 8.9 4.6 10 6.8-.5 1-1.6 2.6-3.3 4M6.4 7C4.3 8.5 2.8 10.7 2 12c1.1 2.2 4.6 6.8 10 6.8 1.5 0 2.9-.4 4.1-1"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m15.2 8.8-2 4.4-4.4 2 2-4.4Z"/></symbol>
+    <symbol id="i-step" viewBox="0 0 24 24"><path d="M6.5 21V4"/><path d="M6.5 5h10.6l-2.8 3.7 2.8 3.7H6.5"/></symbol>
+    <symbol id="i-human" viewBox="0 0 24 24"><circle cx="12" cy="7.6" r="3.4"/><path d="M5.2 20a6.8 6.8 0 0 1 13.6 0"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4.5 21 19H3Z"/><path d="M12 10.2v4"/><path d="M12 16.9h.01"/></symbol>
+    <symbol id="i-contrarian" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m9 9 6 6M15 9l-6 6"/></symbol>
+    <symbol id="i-first" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/><circle cx="12" cy="12" r="1.3"/></symbol>
+    <symbol id="i-strategist" viewBox="0 0 24 24"><path d="M4 17.5 9 11l4 3.2L19.5 6"/><path d="M15.5 6h4v4"/></symbol>
+    <symbol id="i-executor" viewBox="0 0 24 24"><path d="M13 3.5 5.5 13.8h4.6L10 20.5l7.5-10.3h-4.6Z"/></symbol>
+    <symbol id="i-domain" viewBox="0 0 24 24"><path d="M12 3.5 18.5 6v5c0 4.6-3.1 7.5-6.5 8.5C8.6 18.5 5.5 15.6 5.5 11V6Z"/><path d="m9.3 11.4 2 2.1 3.4-4"/></symbol>
+    <symbol id="i-expert" viewBox="0 0 24 24"><circle cx="11" cy="11" r="5.8"/><path d="m15.4 15.4 4.6 4.6"/></symbol>
+    <symbol id="i-reviewer" viewBox="0 0 24 24"><path d="M2.5 12S6 6.2 12 6.2 21.5 12 21.5 12 18 17.8 12 17.8 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.4"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 5.5 6.5 6.5L9 18.5"/></symbol>
+  </defs>
+</svg>
 
 <div class="wrap">
+  <header class="masthead">
+    <div class="mast-top">
+      <span class="seal"><svg class="gicon"><use href="#i-seal"/></svg> The LLM Council</span>
+      <span>Verdict · 2026·07·05</span>
+    </div>
+    <hr class="mast-rule">
+    <h1>Migrate the backend from Firebase to Supabase — now, later, or not at all?</h1>
+    <p class="dek">A small SaaS — Firestore, Firebase Auth, Cloud Functions; ~5,000 users and growing; two full-stack developers and no ops team — weighing a move to Supabase for relational queries and predictable cost.</p>
+    <div class="metaline">
+      <span class="chip hot">Technical / Infrastructure</span>
+      <span class="chip">Contrarian sonnet</span><span class="chip">First-Principles sonnet</span><span class="chip">Strategist sonnet</span><span class="chip">Executor sonnet</span><span class="chip">Domain sonnet</span><span class="chip">Reviewers ×5 sonnet</span><span class="chip">Chairman sonnet</span>
+    </div>
+  </header>
+
   <nav class="tabbar" role="tablist">
-    <button class="tab active" data-panel="verdict" role="tab">Verdict <span class="kbd">1</span></button>
-    <button class="tab" data-panel="council" role="tab">The Council <span class="kbd">2</span></button>
-    <button class="tab" data-panel="review" role="tab">Peer Review <span class="kbd">3</span></button>
+    <button class="tab active" data-panel="verdict" role="tab">Verdict<span class="kbd">1</span></button>
+    <button class="tab" data-panel="council" role="tab">The Council<span class="kbd">2</span></button>
+    <button class="tab" data-panel="review" role="tab">Peer Review<span class="kbd">3</span></button>
   </nav>
 
   <!-- ================= VERDICT ================= -->
   <section class="panel active" id="verdict">
-    <div class="toolbar"><button class="btn" id="copyVerdict">Copy verdict</button>
-      <button class="btn" onclick="window.print()">Print / PDF</button></div>
-
-    <div class="card-box" id="verdictBody">
-      <div class="v-section"><div class="v-ico agree">✓</div><div>
-        <h3>Where the council agrees</h3><p><b>A full big-bang migration now is off the table</b> — all five agree two devs with no ops team cannot safely run a simultaneous live auth + data cutover. <b>Doing nothing forever is also rejected</b> (the debt compounds). <b>Auth and data are different risk classes</b> and must not move on the same timeline. Execution, if any, should be <b>incremental and reversible</b> — never a cutover weekend.</p></div></div>
-      <div class="v-section"><div class="v-ico clash">⚡</div><div>
-        <h3>Where the council clashes</h3><p><b>Is this even a database problem?</b> First-Principles says “relational queries” and “predictable cost” are two smaller problems that don't require leaving Firebase; the Strategist and Contrarian accept Postgres as the destination and argue only timing. <b>Urgency vs. capacity:</b> the Strategist optimizes lifetime cost (“do it now”), the Executor/Contrarian optimize the probability of a catastrophic incident. <b>RLS — feature or tax?</b> Ops-load reduction (Strategist) vs. a permanent, easy-to-get-silently-wrong burden (Contrarian, Domain Specialist).</p></div></div>
-      <div class="v-section"><div class="v-ico blind">◎</div><div>
-        <h3>Blind spots the peer review caught</h3><ul><li><b>Nobody quantified the actual pain</b> — no current cost/latency number, the one figure that settles the urgency debate.</li><li><b>The “stay in one system” option was invisible</b> to all five advisors (Cloud SQL / Firebase Data Connect) — surfaced only by peer review.</li><li><b>Supabase's own lock-in and ops risk</b> (connection pooling, single-region failover, RLS as an ongoing tax) went unweighed.</li><li>No in-production low-stakes pilot or reference-customer conversation proposed; <b>compliance / data residency</b> never addressed.</li></ul></div></div>
+    <div class="toolbar">
+      <button class="btn" id="copyVerdict">Copy verdict</button>
+      <button class="btn" onclick="window.print()">Print / PDF</button>
     </div>
 
-    <div class="rec"><span class="k">The recommendation</span><p><b>Don't migrate now. Don't commit to a vague “later.” Stop treating this as a two-option choice.</b> The strongest reasoning — ranked highest by every peer reviewer — is the First-Principles reframe: solve the two real pains without touching Auth or the write path. Stand up a Postgres <em>companion</em> (even boring Cloud SQL / Firebase Data Connect) fed by CDC/Cloud Functions for relational queries in ~2 weeks with a fully reversible blast radius, and treat “predictable cost” as a <em>measurement</em> problem first. Escalate to a full Auth+data migration only if the companion hits a real wall, a third engineer/ops capacity exists, and the auth-hash path has been tested end-to-end against a prod copy.</p></div>
+    <div id="verdictBody">
+      <div class="sec">
+        <div class="sec-head"><span class="sec-no">§1</span>
+          <h2><svg class="gicon"><use href="#i-agree"/></svg> Where the council agrees</h2><span class="fill"></span></div>
+        <p><b>A full big-bang migration now is off the table</b> — all five agree two devs with no ops team cannot safely run a simultaneous live auth + data cutover. <b>Doing nothing forever is also rejected</b>: the debt compounds. <b>Auth and data are different risk classes</b> and must not move on the same timeline; execution, if any, should be incremental and reversible — never a cutover weekend.</p>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><span class="sec-no">§2</span>
+          <h2><svg class="gicon"><use href="#i-clash"/></svg> Where the council clashes</h2><span class="fill"></span></div>
+        <p><b>Is this even a database problem?</b> First-Principles says “relational queries” and “predictable cost” are two smaller problems that don't require leaving Firebase; the Strategist and Contrarian accept Postgres as the destination and argue only timing. <b>Urgency vs. capacity:</b> the Strategist optimizes lifetime cost, the Executor and Contrarian optimize the probability of a catastrophic incident. <b>RLS — feature or tax?</b> An ops-load reduction, per the Strategist; a permanent, easy-to-get-silently-wrong burden, per the Contrarian and Domain Specialist.</p>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><span class="sec-no">§3</span>
+          <h2><svg class="gicon"><use href="#i-blind"/></svg> Blind spots the review caught</h2><span class="fill"></span></div>
+        <ul><li><b>Nobody quantified the actual pain</b> — no current cost or latency figure, the one number that settles the urgency debate.</li><li><b>The “stay in one system” option was invisible</b> to all five advisors (Cloud SQL / Firebase Data Connect) — surfaced only in peer review.</li><li><b>Supabase's own lock-in and ops risk</b> — connection pooling, single-region failover, RLS as an ongoing tax — went unweighed.</li><li>No in-production low-stakes pilot or reference-customer conversation; <b>compliance and data residency</b> never addressed.</li></ul>
+      </div>
+    </div>
 
-    <div class="first"><div class="num">1</div><div>
-      <span class="k">The one thing to do first</span>
-      <p>Pull the last three months of Firebase billing broken down by service (Firestore reads/writes, Functions invocations, bandwidth) and put a real number next to “predictable cost” — that number decides whether you need a companion database in two weeks, or nothing at all.</p></div></div>
+    <div class="rec">
+      <span class="k"><svg class="gicon"><use href="#i-compass"/></svg> The recommendation</span>
+      <p><b>Don't migrate now. Don't commit to a vague “later.” Stop treating this as a two-option choice.</b> The strongest reasoning — ranked highest by every peer reviewer — is the First-Principles reframe: solve the two real pains without touching Auth or the write path. Stand up a Postgres companion fed by CDC or Cloud Functions for relational queries in about two weeks, with a fully reversible blast radius, and treat “predictable cost” as a measurement problem first. Escalate to a full migration only if the companion hits a real wall, a third engineer exists, and the auth-hash path has been tested end-to-end against a production copy.</p>
+    </div>
+
+    <div class="first">
+      <span class="num">1</span>
+      <div><span class="k"><svg class="gicon" style="width:13px;height:13px"><use href="#i-step"/></svg> The one thing to do first</span>
+      <p>Pull the last three months of Firebase billing broken down by service — Firestore reads and writes, Functions invocations, bandwidth — and put a real number next to “predictable cost.” That number decides whether you need a companion database in two weeks, or nothing at all.</p></div>
+    </div>
 
     
-    <div class="flag">⚠ <b>Verify, don't trust:</b> the claim that Supabase's importer has had compatibility bugs with Firebase Auth's modified-scrypt hash format (causing <em>silent</em> login failures) was asserted by one advisor and corroborated by none. Plausible and worth designing around — but check current Supabase docs/changelog before treating it as fact.</div>
+    <div class="flagnote"><svg class="gicon"><use href="#i-warn"/></svg><div><b>Verify, don't trust:</b> the claim that Supabase's importer has had compatibility bugs with Firebase Auth's modified-scrypt hash format — causing silent login failures — was asserted by one advisor and corroborated by none. Plausible, worth designing around; check current Supabase documentation before treating it as fact.</div></div>
   </section>
 
   <!-- ================= COUNCIL ================= -->
   <section class="panel" id="council">
-    <h2>Where each advisor landed</h2>
-    <div class="card-box spectrum">
-      <div class="axis"><span>Migrate now</span><span>Don't migrate</span></div>
-      <div class="spec-row"><div class="who"><i class="c3"></i>Strategist</div><div class="spec-track"><span class="spec-label c3" style="--pos:14%">Now — dual-write over weeks</span></div></div><div class="spec-row"><div class="who"><i class="c2"></i>First-Principles</div><div class="spec-track"><span class="spec-label c2" style="--pos:50%">Reframe: companion DB</span></div></div><div class="spec-row"><div class="who"><i class="c4"></i>Executor</div><div class="spec-track"><span class="spec-label c4" style="--pos:68%">Later, with a trigger number</span></div></div><div class="spec-row"><div class="who"><i class="c5"></i>Domain Specialist</div><div class="spec-track"><span class="spec-label c5" style="--pos:80%">Later — after rehearsal</span></div></div><div class="spec-row"><div class="who"><i class="c1"></i>Contrarian</div><div class="spec-track"><span class="spec-label c1" style="--pos:92%">Don't — no acute pain</span></div></div>
+    <div class="sec">
+      <div class="sec-head"><span class="sec-no">§4</span>
+        <h2>Where each advisor landed</h2><span class="fill"></span></div>
+      <div class="spectrum">
+        <div class="axis"><span>◀ Migrate now</span><span>Don't migrate ▶</span></div>
+        <div class="spec-row"><div class="who"><svg class="gicon"><use href="#i-strategist"/></svg>Strategist</div><div class="spec-track"><span class="spec-label" style="--pos:15%">Now — dual-write over weeks</span></div></div><div class="spec-row"><div class="who"><svg class="gicon"><use href="#i-first"/></svg>First-Princ.</div><div class="spec-track"><span class="spec-label" style="--pos:50%">Reframe: companion DB</span></div></div><div class="spec-row"><div class="who"><svg class="gicon"><use href="#i-executor"/></svg>Executor</div><div class="spec-track"><span class="spec-label" style="--pos:67%">Later, with a trigger number</span></div></div><div class="spec-row"><div class="who"><svg class="gicon"><use href="#i-domain"/></svg>Domain Spec.</div><div class="spec-track"><span class="spec-label" style="--pos:80%">Later — after rehearsal</span></div></div><div class="spec-row"><div class="who"><svg class="gicon"><use href="#i-contrarian"/></svg>Contrarian</div><div class="spec-track"><span class="spec-label" style="--pos:90%">Don't — no acute pain</span></div></div>
+      </div>
     </div>
 
-    <h2>Full responses</h2>
-    <div class="toolbar">
-      <button class="btn" onclick="toggleAll('council',true)">Expand all</button>
-      <button class="btn" onclick="toggleAll('council',false)">Collapse all</button>
-    </div>
-    <details class="card" data-advisor="1">
-<summary><span class="cbar c1"></span>
+    <div class="sec">
+      <div class="sec-head"><span class="sec-no">§5</span>
+        <h2>Full responses</h2><span class="fill"></span></div>
+      <div class="toolbar">
+        <button class="btn" onclick="toggleAll('council',true)">Expand all</button>
+        <button class="btn" onclick="toggleAll('council',false)">Collapse all</button>
+      </div>
+      <details class="card">
+<summary><span class="cico"><svg class="gicon"><use href="#i-contrarian"/></svg></span>
 <span class="cname">The Contrarian</span>
 <span class="cstance">Don't — negative risk-adjusted payoff unless the pain is already acute.</span>
-<span class="model-chip">sonnet</span><span class="chev">›</span></summary>
-<div class="cbody"><p>“Migrate later once bigger” is the trap — bigger is worse, not better. Every input to migration difficulty gets strictly harder with scale: more write traffic means a longer unsafe cutover window; more data means longer backfill; more features on Firestore's document model means more denormalized data to reshape — the actual hard part. “Better-resourced later” is unearned: no funding event, no headcount plan; “later” is a wish. Companies that defer infra migrations under growth do them under pain at 3× cost after an incident.</p><p>Also unquestioned: will Postgres/RLS actually solve the problem? RLS with two devs writing their own policies is a minefield — silent data leaks from a missed policy are worse than a bad NoSQL query because they're invisible until a breach. Edge Functions aren't drop-in for Cloud Functions. This isn't “swap the database,” it's “rewrite the backend,” sized like a data migration.</p><p><b>Fatal flaw:</b> two devs, no ops, migrating live auth+data for money and convenience — not because Firebase is failing — is a negative risk-adjusted payoff unless the current pain is already acute. If it isn't, this is optimizing a working system into a broken one.</p></div></details><details class="card" data-advisor="2">
-<summary><span class="cbar c2"></span>
+<span class="model-chip">sonnet</span>
+<span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary>
+<div class="cbody"><p>“Migrate later once bigger” is the trap — bigger is worse, not better. Every input to migration difficulty gets strictly harder with scale: more write traffic means a longer unsafe cutover window; more data means longer backfill; more features on Firestore's document model means more denormalized data to reshape — the actual hard part. “Better-resourced later” is unearned: no funding event, no headcount plan; “later” is a wish. Companies that defer infra migrations under growth do them under pain at 3× cost after an incident.</p><p>Also unquestioned: will Postgres/RLS actually solve the problem? RLS with two devs writing their own policies is a minefield — silent data leaks from a missed policy are worse than a bad NoSQL query because they're invisible until a breach. Edge Functions aren't drop-in for Cloud Functions. This isn't “swap the database,” it's “rewrite the backend,” sized like a data migration.</p><p><b>Fatal flaw:</b> two devs, no ops, migrating live auth and data for money and convenience — not because Firebase is failing — is a negative risk-adjusted payoff unless the current pain is already acute. If it isn't, this is optimizing a working system into a broken one.</p></div></details><details class="card">
+<summary><span class="cico"><svg class="gicon"><use href="#i-first"/></svg></span>
 <span class="cname">The First-Principles Thinker</span>
 <span class="cstance">Wrong question — a reversible Postgres companion gives 90% of the want at 5% of the risk.</span>
-<span class="model-chip">sonnet</span><span class="chev">›</span></summary>
-<div class="cbody"><p>What are we actually solving for? Not “Firebase vs Supabase.” The stated pain is “relational queries and predictable cost” — two different problems wearing one trenchcoat, and migrating the entire backend is wildly disproportionate to both.</p><p><b>Relational queries:</b> you don't need to leave Firebase for Postgres. Run Postgres as a read-side companion, sync the subset that needs joins via Cloud Functions or CDC, and query that — relational power without touching Auth or the write path. A two-week project, not two quarters.</p><p><b>Predictable cost:</b> almost never a migration problem — it's a query-pattern problem (N+1 reads, unbounded listeners, whole-collection fetches). Profile the cost drivers first; Supabase at the wrong access pattern gets expensive too.</p><p>The question nobody asked: is “we want relational queries” a genuine bottleneck, or two devs who'd simply rather work in Postgres? A legitimate preference — but name it as taste, not necessity. Add a reversible companion now, fix the cost driver now, and defer the irreversible Auth+Firestore migration indefinitely.</p></div></details><details class="card" data-advisor="3">
-<summary><span class="cbar c3"></span>
+<span class="model-chip">sonnet</span>
+<span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary>
+<div class="cbody"><p>What are we actually solving for? Not “Firebase vs Supabase.” The stated pain is “relational queries and predictable cost” — two different problems wearing one trenchcoat, and migrating the entire backend is wildly disproportionate to both.</p><p><b>Relational queries:</b> you don't need to leave Firebase for Postgres. Run Postgres as a read-side companion, sync the subset that needs joins via Cloud Functions or CDC, and query that — relational power without touching Auth or the write path. A two-week project, not two quarters.</p><p><b>Predictable cost:</b> almost never a migration problem — it's a query-pattern problem (N+1 reads, unbounded listeners, whole-collection fetches). Profile the cost drivers first; Supabase at the wrong access pattern gets expensive too.</p><p>The question nobody asked: is “we want relational queries” a genuine bottleneck, or two devs who'd simply rather work in Postgres? A legitimate preference — but name it as taste, not necessity.</p></div></details><details class="card">
+<summary><span class="cico"><svg class="gicon"><use href="#i-strategist"/></svg></span>
 <span class="cname">The Strategist</span>
 <span class="cstance">Do it now — cost compounds and the data model ossifies — but scoped as dual-write over weeks.</span>
-<span class="model-chip">sonnet</span><span class="chev">›</span></summary>
-<div class="cbody"><p>Six to twelve months out, “migrate now” looks very different depending on whether you count the cost you pay versus the cost you accrue. The cost of staying isn't flat, it's compounding: every new feature built on Firestore's document model becomes migration debt with interest. At 5,000 users you're migrating a database; at 25,000 with three more product surfaces, you're migrating a database <em>and</em> re-architecting the data-access layer under load, with customers noticing downtime. Headcount grows slower than migration surface area.</p><p>The upside nobody's pricing in: RLS + Postgres is an ops-load <em>reduction</em> for a team with no dedicated ops — standard SQL, standard tooling, a hireable talent pool — versus Firebase's rules DSL and bespoke tribal knowledge.</p><p>The real second-order risk is doing it now, badly, with no rollback plan. So the timing question isn't “now vs. later” on the calendar — it's “before or after the data model ossifies.” Do it now, but as dual-write-and-verify over weeks, never a cutover weekend.</p></div></details><details class="card" data-advisor="4">
-<summary><span class="cbar c4"></span>
+<span class="model-chip">sonnet</span>
+<span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary>
+<div class="cbody"><p>Six to twelve months out, “migrate now” looks very different depending on whether you count the cost you pay versus the cost you accrue. The cost of staying isn't flat, it's compounding: every new feature built on Firestore's document model becomes migration debt with interest. At 5,000 users you're migrating a database; at 25,000 with three more product surfaces, you're migrating a database <em>and</em> re-architecting the data-access layer under load, with customers noticing downtime. Headcount grows slower than migration surface area.</p><p>The upside nobody's pricing in: RLS + Postgres is an ops-load <em>reduction</em> for a team with no dedicated ops — standard SQL, standard tooling, a hireable talent pool — versus Firebase's rules DSL and bespoke tribal knowledge.</p><p>The real second-order risk is doing it now, badly, with no rollback plan. So the timing question isn't “now vs. later” on the calendar — it's “before or after the data model ossifies.” Do it now, but as dual-write-and-verify over weeks, never a cutover weekend.</p></div></details><details class="card">
+<summary><span class="cico"><svg class="gicon"><use href="#i-executor"/></svg></span>
 <span class="cname">The Executor</span>
 <span class="cstance">Later — but “later” needs a trigger number, not a vibe. Do the cheap prep now.</span>
-<span class="model-chip">sonnet</span><span class="chev">›</span></summary>
-<div class="cbody"><p>Two devs, no ops team, live production database — that's the whole decision. <b>Migrate now: no.</b> It requires dual-write/export scripts for every collection, a NoSQL-to-relational schema redesign, rewriting every Cloud Function as an Edge Function, re-implementing every Auth flow, writing and testing RLS policies that don't leak, and a cutover+rollback plan. That's 6–10 weeks of near-total roadmap freeze, minimum — and when RLS breaks at 2am, one person fixes it alone.</p><p><b>Stay forever: also no</b> — the pain compounds. The only executable path is “later,” with a trigger: 20k users, $X/month spend, or a third engineer. Until then: stop adding Firestore collections that'll need joins, start a throwaway Supabase side-project so the team learns Postgres/RLS/Edge Functions, and track actual monthly Firebase cost.</p><p><b>Monday morning:</b> write down the trigger number today; open a free Supabase project for an internal tool this quarter. Anything more ambitious with this headcount is roadmap suicide.</p></div></details><details class="card" data-advisor="5">
-<summary><span class="cbar c5"></span>
-<span class="cname">The Domain Specialist<small>Reliability &amp; Security lens</small></span>
+<span class="model-chip">sonnet</span>
+<span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary>
+<div class="cbody"><p>Two devs, no ops team, live production database — that's the whole decision. <b>Migrate now: no.</b> It requires dual-write scripts for every collection, a NoSQL-to-relational schema redesign, rewriting every Cloud Function as an Edge Function, re-implementing every Auth flow, writing and testing RLS policies that don't leak, and a cutover-plus-rollback plan. That's 6–10 weeks of near-total roadmap freeze, minimum — and when RLS breaks at 2am, one person fixes it alone.</p><p><b>Stay forever: also no</b> — the pain compounds. The only executable path is “later,” with a trigger: 20k users, $X/month spend, or a third engineer. Until then: stop adding Firestore collections that'll need joins, start a throwaway Supabase side-project so the team learns the stack, and track actual monthly Firebase cost.</p><p><b>Monday morning:</b> write down the trigger number today; open a free Supabase project for an internal tool this quarter. Anything more ambitious with this headcount is roadmap suicide.</p></div></details><details class="card">
+<summary><span class="cico"><svg class="gicon"><use href="#i-domain"/></svg></span>
+<span class="cname">The Domain Specialist<small>Reliability &amp; Security</small></span>
 <span class="cstance">Later — auth-hash migration is the landmine; runbook, hash-export test, rehearsed rollback first.</span>
-<span class="model-chip">sonnet</span><span class="chev">›</span></summary>
-<div class="cbody"><p>Migrating live production auth <em>and</em> a live production database at the same time, with two generalists and zero ops bench, is the single highest-risk combination on this list — re-sequence before anything else.</p><p><b>Auth is the landmine.</b> Firebase Auth password hashes use a scrypt variant with a secret hash key that isn't exported by default (request via the Admin SDK), in a modified-scrypt format Supabase's importer has historically had compatibility bugs with. Get it slightly wrong and users <em>silently</em> can't log in — failed hash verification doesn't throw, it falls through to “wrong password.” Test the full hash path against a prod copy first; never big-bang auth — run dual-auth (verify Firebase first, fall back to the migrated record, re-hash on login) for a full cycle.</p><p><b>Data:</b> Firestore's denormalized documents don't map 1:1 to tables — design the schema, don't script a dump. <b>RLS is not Firestore rules with new syntax:</b> a missing policy fails safe (no access), but forgetting to enable RLS on a table fails catastrophically <em>open</em> to anyone with the anon key. Dual-write + reconciliation + feature-flagged reads + a <em>rehearsed</em> rollback.</p></div></details>
+<span class="model-chip">sonnet</span>
+<span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary>
+<div class="cbody"><p>Migrating live production auth <em>and</em> a live production database at the same time, with two generalists and zero ops bench, is the single highest-risk combination on this list — re-sequence before anything else.</p><p><b>Auth is the landmine.</b> Firebase Auth password hashes use a scrypt variant with a secret hash key that isn't exported by default, in a modified format Supabase's importer has historically had compatibility bugs with. Get it slightly wrong and users <em>silently</em> can't log in — failed hash verification doesn't throw, it falls through to “wrong password.” Test the full hash path against a production copy first; never big-bang auth — run dual-auth for a full cycle.</p><p><b>Data:</b> Firestore's denormalized documents don't map 1:1 to tables — design the schema, don't script a dump. <b>RLS is not Firestore rules with new syntax:</b> a missing policy fails safe, but forgetting to enable RLS on a table fails catastrophically <em>open</em> to anyone with the anon key. Dual-write, reconciliation, feature-flagged reads, and a <em>rehearsed</em> rollback.</p></div></details>
+    </div>
   </section>
 
   <!-- ================= PEER REVIEW ================= -->
   <section class="panel" id="review">
-    <h2>How the blind review voted</h2>
-    <div class="card-box"><div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Voted strongest response</div><div class="tally-row"><div class="who"><i class="c2"></i>First-Principles</div><div class="tally-bar"><div class="tally-fill c2" style="--w:80%"></div></div><div class="tally-n">4</div></div><div class="tally-row"><div class="who"><i class="c5"></i>Domain Specialist</div><div class="tally-bar"><div class="tally-fill c5" style="--w:20%"></div></div><div class="tally-n">1</div></div><div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px">Flagged as biggest blind spot</div><div class="tally-row"><div class="who"><i class="c3"></i>Strategist</div><div class="tally-bar"><div class="tally-fill c3" style="--w:100%"></div></div><div class="tally-n">5</div></div></div>
-
-    <h2>Reviewer notes</h2>
-    <div class="toolbar">
-      <button class="btn" onclick="toggleAll('review',true)">Expand all</button>
-      <button class="btn" onclick="toggleAll('review',false)">Collapse all</button>
+    <div class="sec">
+      <div class="sec-head"><span class="sec-no">§6</span>
+        <h2>How the blind review voted</h2><span class="fill"></span></div>
+      <div class="tally-head">Voted strongest response</div><div class="tally-row"><span class="who"><svg class="gicon"><use href="#i-first"/></svg>First-Principles</span><span class="dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></span><span class="tally-n">4/5</span></div><div class="tally-row"><span class="who"><svg class="gicon"><use href="#i-domain"/></svg>Domain Specialist</span><span class="dots"><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span><span class="tally-n">1/5</span></div><div class="tally-head">Flagged as biggest blind spot</div><div class="tally-row"><span class="who"><svg class="gicon"><use href="#i-strategist"/></svg>Strategist</span><span class="dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span><span class="tally-n">5/5</span></div>
     </div>
-    <details class="card" data-advisor="r1">
-<summary><span class="cbar c6"></span>
+
+    <div class="sec">
+      <div class="sec-head"><span class="sec-no">§7</span>
+        <h2>Reviewer notes</h2><span class="fill"></span></div>
+      <div class="toolbar">
+        <button class="btn" onclick="toggleAll('review',true)">Expand all</button>
+        <button class="btn" onclick="toggleAll('review',false)">Collapse all</button>
+      </div>
+      <details class="card">
+<summary><span class="cico"><svg class="gicon"><use href="#i-reviewer"/></svg></span>
 <span class="cname">Reviewer 1</span>
-<span class="cstance">Strongest: D (mechanism-level detail). Blind spot: A.</span>
-<span class="model-chip">sonnet</span><span class="chev">›</span></summary>
-<div class="cbody"><p><b>Strongest: D</b> — the only response naming a specific, non-obvious failure mode with mechanism-level detail (scrypt hash export; RLS “missing policy fails closed, un-enabled RLS fails catastrophically open”), converting abstract risk into checkable actions.</p><p><b>Biggest blind spot: A</b> — argues urgency while hand-waving execution risk as a footnote.</p><p><b>All missed:</b> nobody quantified current pain/cost at 5k vs 25k users; Supabase scaling/lock-in symmetry; compliance/data-residency.</p></div></details><details class="card" data-advisor="r2">
-<summary><span class="cbar c6"></span>
+<span class="cstance">Strongest: D — mechanism-level failure detail. Blind spot: A.</span>
+<span class="model-chip">sonnet</span>
+<span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary>
+<div class="cbody"><p><b>Strongest: D</b> — the only response naming a specific, non-obvious failure mode with mechanism-level detail (scrypt hash export; “missing policy fails closed, un-enabled RLS fails catastrophically open”), converting abstract risk into checkable actions.</p><p><b>Biggest blind spot: A</b> — argues urgency while hand-waving execution risk as a footnote.</p><p><b>All missed:</b> nobody quantified current pain at 5k vs 25k users; Supabase lock-in symmetry; compliance and data residency.</p></div></details><details class="card">
+<summary><span class="cico"><svg class="gicon"><use href="#i-reviewer"/></svg></span>
 <span class="cname">Reviewer 2</span>
-<span class="cstance">Strongest: E (questions the frame). Blind spot: A.</span>
-<span class="model-chip">sonnet</span><span class="chev">›</span></summary>
-<div class="cbody"><p><b>Strongest: E</b> — the only one that questions the frame instead of answering inside it; the reversible companion fits a two-dev/no-ops team.</p><p><b>Biggest blind spot: A</b> — treats a strategic timing question as if execution reality didn't exist; most confident, least grounded in who does the work.</p><p><b>All missed:</b> Postgres-without-leaving-Firebase (Cloud SQL / Firebase Data Connect); Supabase exit-cost symmetry.</p></div></details><details class="card" data-advisor="r3">
-<summary><span class="cbar c6"></span>
+<span class="cstance">Strongest: E — questions the frame itself. Blind spot: A.</span>
+<span class="model-chip">sonnet</span>
+<span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary>
+<div class="cbody"><p><b>Strongest: E</b> — the only one that questions the frame instead of answering inside it; the reversible companion fits a two-dev, no-ops team.</p><p><b>Biggest blind spot: A</b> — treats a strategic timing question as if execution reality didn't exist; most confident, least grounded in who does the work.</p><p><b>All missed:</b> Postgres-without-leaving-Firebase (Cloud SQL, Firebase Data Connect); Supabase exit-cost symmetry.</p></div></details><details class="card">
+<summary><span class="cico"><svg class="gicon"><use href="#i-reviewer"/></svg></span>
 <span class="cname">Reviewer 3</span>
-<span class="cstance">Strongest: E (challenges the premise). Blind spot: A.</span>
-<span class="model-chip">sonnet</span><span class="chev">›</span></summary>
-<div class="cbody"><p><b>Strongest: E</b> — questions whether the premise (“we need Postgres”) is even valid rather than litigating timing.</p><p><b>Biggest blind spot: A</b> — “dual-write over weeks” asserted as if it resolves the load-bearing two-person constraint.</p><p><b>All missed:</b> Supabase maturity/vendor risk; reference-customer war stories; a staged pilot on a live low-stakes feature; compliance.</p></div></details><details class="card" data-advisor="r4">
-<summary><span class="cbar c6"></span>
+<span class="cstance">Strongest: E — challenges the premise. Blind spot: A.</span>
+<span class="model-chip">sonnet</span>
+<span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary>
+<div class="cbody"><p><b>Strongest: E</b> — questions whether the premise (“we need Postgres”) is even valid rather than litigating timing.</p><p><b>Biggest blind spot: A</b> — “dual-write over weeks” asserted as if it resolves the load-bearing two-person constraint.</p><p><b>All missed:</b> Supabase maturity and vendor risk; reference-customer war stories; a staged pilot on a live low-stakes feature; compliance.</p></div></details><details class="card">
+<summary><span class="cico"><svg class="gicon"><use href="#i-reviewer"/></svg></span>
 <span class="cname">Reviewer 4</span>
-<span class="cstance">Strongest: E (most decision-useful). Blind spot: A.</span>
-<span class="model-chip">sonnet</span><span class="chev">›</span></summary>
-<div class="cbody"><p><b>Strongest: E</b> — most decision-useful; the “main-character syndrome” challenge (is this need or taste?) is one no other advisor raises. D is technically deepest.</p><p><b>Biggest blind spot: A</b> — never grapples with auth-hash migration, RLS fail-open, or Edge Functions not being drop-in.</p><p><b>All missed:</b> quantify current pain; Supabase ops risks (pooling, single-region failover); a partial-migration unwind plan.</p></div></details><details class="card" data-advisor="r5">
-<summary><span class="cbar c6"></span>
+<span class="cstance">Strongest: E — most decision-useful. Blind spot: A.</span>
+<span class="model-chip">sonnet</span>
+<span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary>
+<div class="cbody"><p><b>Strongest: E</b> — most decision-useful; the “is this need or taste?” challenge is one no other advisor raises. D is technically deepest.</p><p><b>Biggest blind spot: A</b> — never grapples with auth-hash migration, RLS fail-open, or Edge Functions not being drop-in.</p><p><b>All missed:</b> quantify current pain; Supabase ops risks (pooling, single-region failover); a partial-migration unwind plan.</p></div></details><details class="card">
+<summary><span class="cico"><svg class="gicon"><use href="#i-reviewer"/></svg></span>
 <span class="cname">Reviewer 5</span>
-<span class="cstance">Strongest: E (rejects the answer space). Blind spot: A.</span>
-<span class="model-chip">sonnet</span><span class="chev">›</span></summary>
-<div class="cbody"><p><b>Strongest: E</b> — an actionable, reversible path (companion via CDC; cost as an access-pattern problem) that fits “two devs, no ops” better than any full-migration plan.</p><p><b>Biggest blind spot: A</b> — theoretically coherent, least grounded in execution.</p><p><b>All missed:</b> Supabase's own operational risk and RLS as an <em>ongoing</em> tax; a concrete cost comparison at 5k vs 25k; “what does being stuck with Supabase later look like.”</p></div></details>
-    <div class="anon">🎭 Anonymization revealed: A = Strategist · B = Executor · C = Contrarian · D = Domain Specialist · E = First-Principles</div>
+<span class="cstance">Strongest: E — rejects the answer space. Blind spot: A.</span>
+<span class="model-chip">sonnet</span>
+<span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary>
+<div class="cbody"><p><b>Strongest: E</b> — an actionable, reversible path that fits “two devs, no ops” better than any full-migration plan.</p><p><b>Biggest blind spot: A</b> — theoretically coherent, least grounded in execution.</p><p><b>All missed:</b> Supabase's own operational risk and RLS as an <em>ongoing</em> tax; a concrete cost comparison at 5k vs 25k users; “what does being stuck with Supabase later look like.”</p></div></details>
+      <div class="anon"><span class="k">Anonymization revealed</span>A = Strategist · B = Executor · C = Contrarian · D = Domain Specialist · E = First-Principles</div>
+    </div>
   </section>
 
-  <footer>
-    Generated 2026-07-05 08:00 · Decision type: <b>technical / infrastructure</b> · Domain Specialist lens: <b>Reliability &amp; Security</b> · lineup (“keep it light”): all seats <code>sonnet</code> · Expert seat: not seated (predates the feature) · research: off<br>
-    LLM Council v2 — runs on your Claude subscription · full transcript in the matching <code>council-transcript-*.md</code>
+  <footer class="colophon">
+    <hr class="rule"><hr class="rule2">
+    <p>Decision: <b>technical / infrastructure</b> · Domain lens: <b>reliability &amp; security</b> · Lineup (“keep it light”): all seats <b>sonnet</b> · Expert: not seated · Research: off</p>
+    <p>LLM Council v2 · runs on your Claude subscription · transcript: <b>council-transcript-*.md</b></p>
   </footer>
 </div>
 
@@ -303,18 +400,16 @@ function show(id){
 }
 tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.panel)));
 document.addEventListener('keydown',e=>{
-  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
-  const map={'1':'verdict','2':'council','3':'review'};
-  if(map[e.key])show(map[e.key]);
+  if(/INPUT|TEXTAREA/.test(e.target.tagName))return;
+  const m={'1':'verdict','2':'council','3':'review'};
+  if(m[e.key])show(m[e.key]);
 });
-function toggleAll(panelId,open){
-  document.querySelectorAll('#'+panelId+' details').forEach(d=>d.open=open);
-}
+function toggleAll(id,open){document.querySelectorAll('#'+id+' details').forEach(d=>d.open=open)}
 document.getElementById('copyVerdict').addEventListener('click',async e=>{
-  const txt=document.getElementById('verdictBody').innerText+'\n\nRECOMMENDATION\n'+
+  const t=document.getElementById('verdictBody').innerText+'\n\nRECOMMENDATION\n'+
     document.querySelector('.rec').innerText+'\n\nFIRST STEP\n'+document.querySelector('.first').innerText;
-  try{await navigator.clipboard.writeText(txt);e.target.textContent='Copied ✓';
-    setTimeout(()=>e.target.textContent='Copy verdict',1600);}catch(_){}
+  try{await navigator.clipboard.writeText(t);e.target.textContent='Copied ✓';
+    setTimeout(()=>e.target.textContent='Copy verdict',1500)}catch(_){}
 });
 </script>
 </body>

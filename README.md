@@ -110,13 +110,14 @@ The council is a session, not a vending machine. Three light checkpoints — say
 
 ## The report
 
-Every run fills the shipped [`report-template.html`](report-template.html) — a self-contained interactive briefing, not a wall of text:
+Every run fills the shipped [`report-template.html`](report-template.html) — an editorial briefing, not a dashboard. Warm paper, near-black ink, one oxblood accent, hairline rules, serif display type with mono small-caps labels, and a consistent inline SVG stroke-icon system (no emoji, no images, no webfonts):
 
-- **Three tabs** (Verdict / The Council / Peer Review) with keyboard shortcuts `1`–`3`
-- **Position spectrum** — every advisor placed on the decision axis at a glance
-- **Blind-vote tally bars** — who the anonymous review ranked strongest, and whose blind spot got flagged
-- Collapsible advisor cards with per-advisor colors + model chips, cross-examination threads inline
-- Distinct callouts: recommendation, the one-first-step, **Consult Before Acting** (red), unverified-claim flags (amber), `[verified]`/`[recalled]` highlighting in Expert responses
+- **Three tabs** (Verdict / The Council / Peer Review) as understated underline nav, keyboard `1`–`3`
+- **§-numbered verdict sections** with stroke icons — agreement, dissent, blind spots
+- **Hairline position spectrum** — each advisor as a diamond marker on the decision axis
+- **Dot-matrix blind-vote tally** — who the anonymous review ranked strongest, whose blind spot got flagged
+- Hairline-separated advisor entries (icon medallion, stance line, mono model tag), cross-examination threads inline
+- **Consult Before Acting** as a bordered accent block; unverified claims as a dashed footnote; `[verified]`/`[recalled]` as dotted-underline citations in Expert responses
 - **Automatic dark mode**, print/PDF stylesheet, copy-verdict button, zero external assets — works offline forever
 
 *(Preview: open [`examples/firebase-to-supabase-migration.report.html`](examples/firebase-to-supabase-migration.report.html) in a browser.)*

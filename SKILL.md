@@ -335,19 +335,21 @@ Token reference (all HTML-safe strings; fill empty string where noted):
 | `{{TIMESTAMP}}` | Human-readable run time |
 | `{{LINEUP_CHIPS}}` | One `<span class="chip">Seat · model</span>` per seat (incl. Expert + research state when seated) |
 | `{{SPECTRUM_AXIS_LEFT}}` / `{{SPECTRUM_AXIS_RIGHT}}` | The two poles of the decision (e.g. "Migrate now" / "Don't migrate") |
-| `{{SPECTRUM_ROWS}}` | One `<div class="spec-row" style="--pos:NN%">…` per advisor: dot position on the axis + ≤12-word stance |
+| `{{SPECTRUM_ROWS}}` | One per advisor: `<div class="spec-row"><div class="who"><svg class="gicon"><use href="#i-…"/></svg>Name</div><div class="spec-track"><span class="spec-label" style="--pos:NN%">≤6-word stance</span></div></div>` |
 | `{{VERDICT_AGREES}}` / `{{VERDICT_CLASHES}}` / `{{VERDICT_BLINDSPOTS}}` | Chairman sections as `<p>`/`<ul>` HTML |
 | `{{RECOMMENDATION}}` | The chairman's recommendation, `<p>` HTML |
 | `{{FIRST_STEP}}` | The one thing to do first |
-| `{{CONSULT_HUMAN_BLOCK}}` | Full `<div class="consult">…</div>` alert ONLY when the verdict includes Consult Before Acting; else empty string |
-| `{{VERIFY_FLAGS_BLOCK}}` | Amber `<div class="flag">…</div>` for uncorroborated claims; empty string if none |
-| `{{ADVISOR_CARDS}}` | One `<details class="card" data-advisor="N">` per advisor: color bar, name, model chip, stance line, full response |
-| `{{REVIEW_TALLY}}` | `<div class="tally-row">` bars: "voted strongest" counts and "biggest blind spot" counts |
+| `{{CONSULT_HUMAN_BLOCK}}` | ONLY when the verdict includes Consult Before Acting: `<div class="consult"><span class="k"><svg class="gicon"><use href="#i-human"/></svg> Consult before acting</span><p>…</p></div>`; else empty string |
+| `{{VERIFY_FLAGS_BLOCK}}` | For uncorroborated claims: `<div class="flagnote"><svg class="gicon"><use href="#i-warn"/></svg><div>…</div></div>`; empty string if none |
+| `{{ADVISOR_CARDS}}` | One per advisor: `<details class="card"><summary><span class="cico">[icon svg]</span><span class="cname">Name<small>lens</small></span><span class="cstance">≤15-word stance</span><span class="model-chip">model</span><span class="chev"><svg class="gicon"><use href="#i-chev"/></svg></span></summary><div class="cbody">full response</div></details>` |
+| `{{REVIEW_TALLY}}` | `<div class="tally-head">` group labels ("Voted strongest response" / "Flagged as biggest blind spot") + `<div class="tally-row"><span class="who">[icon]Name</span><span class="dots">` five `<span class="dot">` (add class `on` for filled) `</span><span class="tally-n">N/5</span></div>` |
 | `{{REVIEW_CARDS}}` | One collapsible card per reviewer |
 | `{{ANON_MAP}}` | The revealed letter→advisor mapping line |
 | `{{FOOTER_MODELS}}` | Full lineup with models, decision type, research state |
 
-**Fallback** (only if the template file is missing): generate a single self-contained HTML file with the same components — sticky tab navigation (Verdict / The Council / Peer Review), position spectrum, vote tally, collapsible advisor cards with per-advisor accent colors and model chips, a distinct red callout for Consult Before Acting, an amber flag for unverified claims, dark-mode via `prefers-color-scheme`, print stylesheet, system font stack, no external assets.
+**Icon sprite** — the template ships an inline SVG symbol set; reference icons with `<svg class="gicon"><use href="#id"/></svg>`. Advisor ids: `i-contrarian`, `i-first`, `i-strategist`, `i-executor`, `i-domain`, `i-expert`, `i-reviewer`. Utility ids: `i-agree`, `i-clash`, `i-blind`, `i-compass`, `i-step`, `i-human`, `i-warn`, `i-chev`, `i-seal`. Use these — never emoji — in any content you inject.
+
+**Fallback** (only if the template file is missing): generate a single self-contained HTML file in the same editorial-minimal style — warm paper background, near-black ink, ONE accent color, hairline rules, serif display type (`ui-serif`/Georgia stack), mono small-caps labels, inline SVG stroke icons (no emoji), numbered § sections, hairline spectrum with diamond markers, dot-matrix vote tally, collapsible advisor entries, a bordered Consult Before Acting block, dark-mode via `prefers-color-scheme`, print stylesheet, zero external assets.
 
 ### step 6: save the full transcript
 
